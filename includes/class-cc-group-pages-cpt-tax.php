@@ -48,7 +48,7 @@ class CC_Group_Pages_CPT_Tax {
 	        'labels' => $labels,
 	        'hierarchical' => false,
 	        'description' => 'Information pages displayed in BuddyPress groups.',
-	        'supports' => array( 'title', 'editor', 'comments', 'revisions' ),
+	        'supports' => array( 'title', 'editor', 'comments', 'revisions', 'thumbnail' ),
 	        'taxonomies' => array( 'ccgp_related_groups' ),
 	        'public' => false,
 	        'show_ui' => true,

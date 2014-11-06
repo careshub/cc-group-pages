@@ -2,3 +2,43 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+.pages .hub-pages-toc {
+ 	list-style-type: none;
+ 	font-size: 16.8px;
+ 	font-size: 1.2rem;
+}
+.pages .hub-pages-toc li {
+	margin-left: 1em;
+}
+.hub-pages-toc .actions {
+ 	display: inline-block;
+ 	font-size: 14px;
+ 	font-size: 1rem;
+}
+.hub-pages-toc .actions .edit-link,
+.hub-pages-toc .actions .post-status {
+	display: inline-block;
+ 	margin-left: 1em;
+}
+.hub-pages-toc .actions .post-status {
+	color: #666;
+	font-style: italic;
+}
+.create-new-page {
+	margin-bottom: 1em;
+}
+/* Prevent colision between create button and message */
+.pages #message {
+	clear: both;
+}
+
+/* Edit styles */
+.wp-editor-wrap {
+	margin-top: 1.8em;
+}
+.wp-editor-container {
+	border: 1px solid #dedede;
+}
+.mce-btn button:hover {
+	border: none;
+}

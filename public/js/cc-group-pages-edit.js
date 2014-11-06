@@ -1,6 +1,12 @@
 (function( $ ) {
 	'use strict';
 
+	window.onbeforeunload = function(e) {
+		if ( $( '#ccgp_published' ).val() == 'trash' ) {
+			return 'Are you sure you want to delete this page?';
+		}
+	};
+
 	/**
 	 * All of the code for your public-facing JavaScript source
 	 * should reside in this file.
