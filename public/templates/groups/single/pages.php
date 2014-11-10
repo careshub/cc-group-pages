@@ -71,24 +71,37 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 				</div>
 
 			</div>
-			<ul class="hub-pages-toc">
+			<div class="hub-pages-toc">
 				<?php 
 				do_action( 'bp_before_group_pages_list' );
+				$i = 0;
 				while ( $q->have_posts() ) : $q->the_post();
+				if ( $i % 3 == 0 ) {
+					echo '<div class="container-row">';
+				}
+				$featured_image = get_the_post_thumbnail( get_the_ID(), 'feature-front-sub');
 				?>
-				<li><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+				<div class="third-block">
+					<?php if ($featured_image) { ?>
+						<a href="<?php the_permalink(); ?>" title="<?php echo esc_attr( sprintf( __( 'Permalink to %s', 'twentytwelve' ), the_title_attribute( 'echo=0' ) ) ); ?>" rel="bookmark" class="front<?php echo $layout_location ?>"><?php echo $featured_image; ?></a>
+					<?php } ?>
+					<a href="<?php the_permalink(); ?>" class="cc-pages-title"><?php the_title(); ?></a>
 					<?php  if ( $ccgp_class->current_user_can_post() ) : ?>
 						<div class="actions">
 							<?php do_action( 'cc_group_pages_toc_post_actions', get_the_ID() ); ?>
 						</div>
 					<?php endif; ?>
-				</li>
+				</div>
 				<?php
+				if ( $i % 3 == 2 ) {
+					echo '</div> <!-- end .third-block -->';
+				}
+				$i++;
 				endwhile;
 
 				do_action( 'bp_after_group_pages_content' );
 				?>
-			</ul>
+			</div>
 
 		<?php else: ?>
 
