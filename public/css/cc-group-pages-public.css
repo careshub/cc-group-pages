@@ -24,9 +24,9 @@
 	color: #666;
 	font-style: italic;
 }
-.create-new-page {
+/*.create-new-page {
 	margin-bottom: 1em;
-}
+}*/
 /* Prevent colision between create button and message */
 .pages #message {
 	clear: both;

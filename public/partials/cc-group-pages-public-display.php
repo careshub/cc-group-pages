@@ -28,3 +28,9 @@ function ccgp_add_post_status_to_toc( $post_id ){
 	endif;
 }
 add_action( 'cc_group_pages_toc_post_actions', 'ccgp_add_post_status_to_toc', 9 );
+
+function ccgp_the_fallback_thumbnail(){
+    ?>
+    <img width="300" height="200" alt="default hub page image" class="attachment-feature-front-sub wp-post-image" src="<?php echo plugin_dir_url( dirname( dirname( __FILE__ ) ) ) . 'img/cc_default_thumbnail.png'; ?>">
+    <?php
+}

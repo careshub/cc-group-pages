@@ -107,7 +107,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
         /**
          * Use this function to display the actual content of your group extension when the nav item is selected
          */
-        function display() {
+        function display( $group_id = null ) {
 			// Template location is handled via the template stack. see load_template_filter()
 			bp_get_template_part( 'groups/single/pages' );
         }

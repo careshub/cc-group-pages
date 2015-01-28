@@ -97,7 +97,7 @@ class CC_Group_Pages_CPT_Tax {
 	        'show_in_nav_menus' => false,
 	        'show_ui' => true,
 	        'show_tagcloud' => false,
-	        'show_admin_column' => false,
+	        'show_admin_column' => true,
 	        'hierarchical' => true,
 
 	        'rewrite' => true,

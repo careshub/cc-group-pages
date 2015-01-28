@@ -89,7 +89,7 @@ class CC_Group_Pages {
 
 		$this->plugin_name = 'cc-group-pages';
 		$this->plugin_slug = 'pages';
-		$this->version = '1.0.0';
+		$this->version = '1.1.0';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -101,6 +101,9 @@ class CC_Group_Pages {
 		add_filter( 'bp_init', array( $cpt_tax_class, 'register_cpt') );
 		// Register the custom taxonomy
 		add_filter( 'bp_init', array( $cpt_tax_class, 'register_taxonomy') );
+
+		// Add our templates to BuddyPress' template stack.
+		add_filter( 'bp_get_template_stack', array( $this, 'add_template_stack'), 10, 1 );
 
 		// add_action( 'bp_include', array( $this, 'remove_shortcode_filter_on_settings_screen' ), 11 );
 		// Catch saves
@@ -762,59 +765,32 @@ class CC_Group_Pages {
 	}
 
 	/** TEMPLATE LOADER ************************************************/
-	/**
-	* If a template does not exist in the current theme, we will use our own
-	* bundled templates.
-	*
-	* We're doing two things here:
-	* 1) Support the older template format for themes that are using them
-	* for backwards-compatibility (the template passed in
-	* {@link bp_core_load_template()}).
-	* 2) Route older template names to use our new template locations and
-	* format.
-	*
-	* From work by r-a-y
-	*
-	* @since 1.1
-	*/
-	public function load_template_filter( $found_template, $templates ) {
-		// Only filter the template location when we're on the group invitation screen, the group creation invite-anyone step, or the members component
-		if ( ! $this->is_component() )
-			return $found_template;
-
-		// $found_template may not empty if template files were found in the
-		// parent or child theme
-		if ( empty( $found_template ) ) {
-			// locate_template() will attempt to find the plugins.php template in the
-			// child and parent theme and return the located template when found
-			$found_template = locate_template( '/groups/single/plugins.php', false, false );
-		}
-
-		// Register our theme compat directory.
-		// This tells BP to look for templates in our plugin directory 
-		// if the template isn't found in the parent/child theme.
-		bp_register_template_stack( array( $this, 'get_template_directory' ), 14 );
-
-		if ( 1 == 1 ) {
-			// add our hook to inject content into BP's group screen
-			add_action( 'bp_template_content', create_function( '', "
-				bp_get_template_part( 'groups/single/pages' );
-			" ) );
-		}
-
-		return apply_filters( 'ccgp_load_template_filter', $found_template );
-	}
 
 	/**
-	* Get the template directory.
+	* Get the location of the template directory.
 	*
-	* @since 1.1
+	* @since 1.1.0
 	*
 	* @uses apply_filters()
 	* @return string
 	*/
 	public function get_template_directory() {
-	return apply_filters( 'ccgp_get_template_directory', plugin_dir_path( __FILE__ ) . 'public/templates' );
+	return apply_filters( 'ccgp_get_template_directory', plugin_dir_path( __FILE__ ) . '../public/templates' );
+	}
+
+	/**
+	 * Add our templates to BuddyPress' template stack.
+	 *
+	 * @since    1.1.0
+	 */
+	public function add_template_stack( $templates ) {
+	    // if we're on a page of our plugin and the theme is not BP Default, then we
+	    // add our path to the template path array
+	    if ( $this->is_component() ) {
+	        $templates[] = trailingslashit( $this->get_template_directory() );
+	    }
+
+	    return $templates;
 	}
 
 	/**
@@ -844,7 +820,7 @@ class CC_Group_Pages {
 	      }
 	}
 
-		/**
+	/**
 	 * Filter "map_meta_caps" to let our users do things they normally can't.
 	 *
 	 * @since    1.0.0

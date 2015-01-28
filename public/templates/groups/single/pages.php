@@ -6,15 +6,15 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 
 	$ccgp_class = new CC_Group_Pages();
 	?>
-	<div id="subnav" class="item-list-tabs no-ajax">
-		<ul class="nav-tabs"> 
+	<div id="subnav" class="item-list-tabs no-ajax" role="navigation">
+		<ul> 
+			<li<?php if ( $ccgp_class->is_home() ) { echo ' class="current selected"'; } ?>><a href="<?php echo $ccgp_class->get_base_permalink(); ?>" class="table-of-contents">Table of Contents</a></li>
 		<?php //ccgn_options_menu(); ?>
+		<?php if ( ! $ccgp_class->is_post_edit() && $ccgp_class->current_user_can_post() ) : ?>
+			<li class="last"><a href="<?php echo $ccgp_class->get_create_permalink(); ?>" class="create-new-page">Create new page</a></li>
+		<?php endif; ?>
 		</ul>
 	</div>
-
-	<?php if ( $ccgp_class->current_user_can_post() ) : ?>
-		<a href="<?php echo $ccgp_class->get_create_permalink(); ?>" class="alignright button create-new-page">Create new page</a>
-	<?php endif; ?>
 
 	<?php
 	if( $ccgp_class->is_single_post() ) {
@@ -39,7 +39,7 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 		?>
 
 			<div id="message" class="info">
-				<p><?php _e( 'That post does not appear to exist.', 'bcg' ); ?></p>
+				<p><?php _e( 'We aren\'t able to find that post.', 'bcg' ); ?></p>
 			</div>
 
 		<?php 
@@ -82,9 +82,12 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 				$featured_image = get_the_post_thumbnail( get_the_ID(), 'feature-front-sub');
 				?>
 				<div class="third-block">
-					<?php if ($featured_image) { ?>
-						<a href="<?php the_permalink(); ?>" title="<?php echo esc_attr( sprintf( __( 'Permalink to %s', 'twentytwelve' ), the_title_attribute( 'echo=0' ) ) ); ?>" rel="bookmark" class="front<?php echo $layout_location ?>"><?php echo $featured_image; ?></a>
-					<?php } ?>
+					<a href="<?php the_permalink(); ?>" title="<?php echo esc_attr( sprintf( __( 'Permalink to %s', 'twentytwelve' ), the_title_attribute( 'echo=0' ) ) ); ?>" rel="bookmark" class="front"><?php 
+						if ( $featured_image ) {
+							echo $featured_image; 
+						} else {
+							ccgp_the_fallback_thumbnail();
+						}?></a>
 					<a href="<?php the_permalink(); ?>" class="cc-pages-title"><?php the_title(); ?></a>
 					<?php  if ( $ccgp_class->current_user_can_post() ) : ?>
 						<div class="actions">
