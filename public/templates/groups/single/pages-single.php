@@ -6,6 +6,9 @@
  * @subpackage Twenty_Twelve
  * @since Twenty Twelve 1.0
  */
+// On the single view, we want WP to ignore any more tags.
+global $more;
+$more = 1;
 ?>
 
 	<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -32,19 +35,19 @@
 			<?php wp_link_pages( array( 'before' => '<div class="page-links">' . __( 'Pages:', 'twentytwelve' ), 'after' => '</div>' ) ); ?>
 		</div><!-- .entry-content -->
 
-		<?php 
+		<?php
 		// if ( function_exists('bp_share_favorite_post_button') ) {
 		// 		bp_share_favorite_post_button( $post->ID );
 		// 	}
-			if ( function_exists('cc_add_comment_button') ) { 
-					cc_add_comment_button( get_the_ID() ); 
+			if ( function_exists('cc_add_comment_button') ) {
+					cc_add_comment_button( get_the_ID() );
 				}
-			if ( function_exists('love_it_button') ) { 
-					love_it_button(); 
+			if ( function_exists('love_it_button') ) {
+					love_it_button();
 				}
-			if ( function_exists('bp_share_post_button') ) { 
-					bp_share_post_button(); 
-				} 
+			if ( function_exists('bp_share_post_button') ) {
+					bp_share_post_button();
+				}
 		?>
 
 		<footer class="entry-meta">

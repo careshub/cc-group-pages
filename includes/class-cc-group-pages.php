@@ -533,6 +533,7 @@ class CC_Group_Pages {
 	}
 
 	public function get_post_form( $group_id = false ){
+		// @TODO: Add ability to upload featured image from front end.
 		$group_id = $group_id ? $group_id : bp_get_current_group_id();
 		
 		// Should the user be able to visit this page?
