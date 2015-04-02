@@ -118,7 +118,7 @@ class CC_Group_Pages {
 		add_action( 'pre_get_posts', array( $this, 'show_users_own_attachments') );
 
 
- 
+
 	}
 
 	/**
@@ -189,7 +189,7 @@ class CC_Group_Pages {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/partials/cc-group-pages-public-display.php';
 
-		
+
 		// $this->loader = new CC_Group_Pages_Loader();
 
 	}
@@ -236,20 +236,28 @@ class CC_Group_Pages {
 	 * @access   private
 	 */
 	private function define_public_hooks() {
+		$plugin_public = new CC_Group_Pages_Public( $this->get_plugin_name(), $this->get_version() );
 
 		if ( $this->is_component() ) {
-			$plugin_public = new CC_Group_Pages_Public( $this->get_plugin_name(), $this->get_version() );
 			add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_styles') );
 			// add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_scripts') );
+
+			if ( $this->is_post_edit() ) {
+				// add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_edit_scripts') );
+				add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_edit_styles') );
+			}
 		}
 
-		if ( $this->is_post_edit() ) {
-			$plugin_public = new CC_Group_Pages_Public( $this->get_plugin_name(), $this->get_version() );
-			// add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_edit_scripts') );
-			add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_edit_styles') );
-
+		if ( $this->is_group_manage() ) {
+			add_action('wp_enqueue_scripts', array( $plugin_public, 'enqueue_group_manage_scripts' ) );
+			add_action( 'wp_footer', array( $plugin_public, 'include_group_manage_js_templates' ), 99 );
 		}
 
+		// add our callback to both ajax actions.
+		add_action( "wp_ajax_ccgp_get_page_details", array( $plugin_public, "ccgp_ajax_retrieve_page_details" ) );
+		add_action( "wp_ajax_nopriv_ccgp_get_page_details", array( $plugin_public, "ccgp_ajax_retrieve_page_details" ) );
+		add_action( "wp_ajax_ccgp_get_page_order", array( $plugin_public, "ccgp_ajax_retrieve_page_order" ) );
+		add_action( "wp_ajax_nopriv_ccgp_get_page_order", array( $plugin_public, "ccgp_ajax_retrieve_page_order" ) );
 	}
 
 	/**
@@ -303,7 +311,7 @@ class CC_Group_Pages {
 		$group_id = ( $group_id ) ? $group_id : bp_get_current_group_id();
 		$label = groups_get_groupmeta( $group_id, 'ccgp_tab_label' );
 		$label = ! empty( $label ) ? $label : 'Pages' ;
-		
+
 		return apply_filters( 'ccgp_get_tab_label', $label);
 	}
 
@@ -316,7 +324,7 @@ class CC_Group_Pages {
 	public function get_enabled_status( $group_id = false ) {
 		$group_id = ( $group_id ) ? $group_id : bp_get_current_group_id();
 		$is_enabled = (bool) groups_get_groupmeta( $group_id, "ccgp_is_enabled" );
-		
+
 		return apply_filters( "ccgp_is_enabled", $is_enabled, $group_id);
 	}
 
@@ -324,7 +332,7 @@ class CC_Group_Pages {
 	 * Should we show the tab?
 	 *
 	 * @since     1.0.0
-	 * @return    string   	access level if activated and content to display. 
+	 * @return    string   	access level if activated and content to display.
 	 *			  			noone|member|mod|admin|anyone
 	 */
 	public function get_tab_visibility( $group_id = false ) {
@@ -354,7 +362,7 @@ class CC_Group_Pages {
 
 	/**
 	 * Create or update the taxonomy term specific to group.
-	 * 
+	 *
  	 * @since     1.0.0
 	 * @return integer
 	 */
@@ -369,8 +377,8 @@ class CC_Group_Pages {
 
 		// Check for a term for this group's parent group, set a value for the term's 'parent' arg
 		// Depends on BP_Group_Hierarchy being active
-		if  ( ( $parent_group_id = $group_object->vars['parent_id'] )  &&  
-				( $parent_group_term = get_term_by( 'slug', $ccgp_class->create_taxonomy_slug( $parent_group_id ), 'ccgp_related_groups' ) ) 
+		if  ( ( $parent_group_id = $group_object->vars['parent_id'] )  &&
+				( $parent_group_term = get_term_by( 'slug', $ccgp_class->create_taxonomy_slug( $parent_group_id ), 'ccgp_related_groups' ) )
 			) {
 			$term_args['parent'] = (int) $parent_group_term->term_id;
 		}
@@ -387,13 +395,13 @@ class CC_Group_Pages {
 
 	/**
 	 * Get the taxonomy term specific to group.
-	 * 
+	 *
 	 * @since     1.0.0
 	 * @return integer
 	 */
 	public function get_group_term_id( $group_id = false ) {
 		$group_id = ( $group_id ) ? $group_id : bp_get_current_group_id();
-		
+
 		if ( $term = get_term_by( 'slug', $this->create_taxonomy_slug( $group_id ), 'ccgp_related_groups' ) ) {
 			return $term->term_id;
 		} else {
@@ -403,7 +411,7 @@ class CC_Group_Pages {
 	}
 	/**
 	 * Build the taxonomy slug.
-	 * 
+	 *
 	 * @since     1.0.0
 	 * @return string
 	 */
@@ -413,15 +421,15 @@ class CC_Group_Pages {
 	}
 	/**
 	 * Reverse lookup the group id from the term.
-	 * 
+	 *
 	 * @since     1.0.0
 	 * @return string
 	 */
 	public function get_group_id_from_post_id( $post_id = false ) {
-			$towrite = PHP_EOL . 'incoming post_id: ' . print_r($post_id, TRUE);  
+			$towrite = PHP_EOL . 'incoming post_id: ' . print_r($post_id, TRUE);
 			$fp = fopen('ccgp-save.txt', 'a');
 			fwrite($fp, $towrite);
-			fclose($fp);  
+			fclose($fp);
 
 		if ( ! $post_id )
 			return 0;
@@ -435,14 +443,14 @@ class CC_Group_Pages {
 			return 0;
 		}
 
-		$group_id = (int) str_replace( 'ccgp_related_group_', '', $term_list[0]->slug ); 
+		$group_id = (int) str_replace( 'ccgp_related_group_', '', $term_list[0]->slug );
 
 		return $group_id;
 	}
 
 	/**
 	 * Update group meta settings.
-	 * 
+	 *
 	 * @since  1.0.0
 	 * @return boolean
 	 */
@@ -464,7 +472,7 @@ class CC_Group_Pages {
 				case ( empty( $new_setting ) ) :
 					// Remove existing entries
 					$success = groups_delete_groupmeta( $group_id, $field );
-					break;	
+					break;
 				default:
 					$success = groups_update_groupmeta( $group_id, $field, $new_setting );
 					break;
@@ -484,12 +492,12 @@ class CC_Group_Pages {
 
 	/**
 	 * Helper functions to determine what is going on/what action is being requested.
-	 * @return bool 
+	 * @return bool
 	 */
 	public function is_component(){
 		if ( bp_is_groups_component() && bp_is_current_action( $this->get_plugin_slug() ) )
 			return true;
-		
+
 		return false;
 	}
 
@@ -517,7 +525,13 @@ class CC_Group_Pages {
 		}
 		return false;
 	}
-
+	// Editing a post happens at pages/edit/post_id.
+	public function is_group_manage(){
+		if ( bp_is_groups_component() && bp_is_current_action( 'admin' ) && bp_action_variable( 0 ) == $this->get_plugin_slug() ) {
+			return true;
+		}
+		return false;
+	}
 	public function current_user_can_post(){
 		if ( current_user_can( 'delete_pages' ) ) {
 			return true;
@@ -535,7 +549,7 @@ class CC_Group_Pages {
 	public function get_post_form( $group_id = false ){
 		// @TODO: Add ability to upload featured image from front end.
 		$group_id = $group_id ? $group_id : bp_get_current_group_id();
-		
+
 		// Should the user be able to visit this page?
 		if ( ! $this->current_user_can_post() ) {
 			echo '<div id="message" class="error"><p>You do not have the capability to edit or create posts in this group.</p></div>';
@@ -580,7 +594,7 @@ class CC_Group_Pages {
 		<form enctype="multipart/form-data" action="<?php echo $this->get_base_permalink() . "edit/" . $post_id; ?>" method="post" class="standard-form">
 
 			<label for="ccgp_title">Title&emsp;<input type="text" value="<?php echo apply_filters( "the_title", $post_title ); ?>" name="ccgp_title" size="80"></label>
-		
+
 			<?php
 			$args = array(
 					// 'textarea_rows' => 100,
@@ -591,7 +605,7 @@ class CC_Group_Pages {
 					'editor_height' => 360,
 					'tabfocus_elements' => 'insert-media-button,save-post',
 				);
-				wp_editor( $post_content, 'ccgp_content', $args); 
+				wp_editor( $post_content, 'ccgp_content', $args);
 			?>
 
 			<div class="narrative-meta">
@@ -600,24 +614,24 @@ class CC_Group_Pages {
 					<select name="ccgp_published" id="ccgp_published">
 						<option value="publish" <?php selected( $post_published, "publish" ); ?>>Published</option>
 						<option  value="draft" <?php
-							if ( empty( $post_published ) || $post_published == 'draft' ) { 
-								echo 'selected="selected"' ; 
-							} 
+							if ( empty( $post_published ) || $post_published == 'draft' ) {
+								echo 'selected="selected"' ;
+							}
 							?>>Draft</option>
 						<option value="trash" <?php selected( $post_published, "trash" ); ?>>Trash</option>
 					</select>
 				</p>
 
 				<p>
-					<label for="ccgp_comment_status"> <input type="checkbox" value="open" id="ccgp_comment_status" name="ccgp_comment_status" <?php 
-					if ( empty( $comment_status ) || $comment_status == 'open' ) { 
-						echo 'checked="checked"'; 
+					<label for="ccgp_comment_status"> <input type="checkbox" value="open" id="ccgp_comment_status" name="ccgp_comment_status" <?php
+					if ( empty( $comment_status ) || $comment_status == 'open' ) {
+						echo 'checked="checked"';
 					} ?>> Allow comments on this post.</label>
 				</p>
 			</div>
 
 			<input type="hidden" name="group_id" value="<?php echo $group_id; ?>">
-			<!-- This is created for the media modal to reference 
+			<!-- This is created for the media modal to reference
 			TODO: This doesn't work.-->
 			<input id="post_ID" type="hidden" value="<?php echo $post_id; ?>" name="post_ID">
 
@@ -691,7 +705,7 @@ class CC_Group_Pages {
 
 	/**
 	 * Get the appropriate query for various screens
-	 * 
+	 *
 	 * @return array of args for WP_Query
 	 */
 	public function get_query( $group_id = null, $status = null ) {
@@ -702,7 +716,7 @@ class CC_Group_Pages {
 				'name' => bp_action_variable( 0 ),
 				'post_type' => 'cc_group_page',
 				// 'post_status' => array( 'publish', 'draft'),
-			);		
+			);
 		} else {
 			$group_id = $group_id ? $group_id : bp_get_current_group_id();
 			// Not a single post, this is the list of narratives for a group.
@@ -740,7 +754,7 @@ class CC_Group_Pages {
 	//Permalinks
 	/**
 	 * Get the permalink of the Narratives tab if set
-	 * 
+	 *
 	 * @return string: URI
 	 */
 	public function get_base_permalink( $group_id = false ){
@@ -800,7 +814,7 @@ class CC_Group_Pages {
 	 * @since    1.0.0
 	 */
 	public function permalink_filter( $permalink, $post ) {
-	 
+
 	    if ( 'cc_group_page' == get_post_type( $post )  ) {
 	    	$group_id = $this->get_group_id_from_post_id( $post->ID );
 	        $permalink = $this->get_base_permalink( $group_id ) . $post->post_name;
@@ -810,7 +824,7 @@ class CC_Group_Pages {
 	}
 
 	/**
-	 * We need to stop the evaluation of shortcodes on this plugin's group settings screen. 
+	 * We need to stop the evaluation of shortcodes on this plugin's group settings screen.
 	 * If they're interpreted for display, then the code is consumed and lost upon the next save.
 	 *
 	 * @since    1.0.0
@@ -838,17 +852,17 @@ class CC_Group_Pages {
 	 *
 	 * @since    1.0.0
 	 */
-	public function setup_map_meta_cap( $primitive_caps, $meta_cap, $user_id, $args ) {	
+	public function setup_map_meta_cap( $primitive_caps, $meta_cap, $user_id, $args ) {
 		// In order to upload media, a user needs to have caps.
-		// Check if this is a request we want to filter. 
-		if ( ! in_array( $meta_cap, array( 'upload_files', 'edit_post', 'delete_post' ) ) ) {  
-	        return $primitive_caps;  
+		// Check if this is a request we want to filter.
+		if ( ! in_array( $meta_cap, array( 'upload_files', 'edit_post', 'delete_post' ) ) ) {
+	        return $primitive_caps;
 	    }
 
 		// It would be useful for a user to be able to delete her own uploaded media.
 	    // If this is someone else's post, we don't want to allow deletion of that, though.
 	    if ( $meta_cap == 'delete_post' && in_array( 'delete_others_posts', $primitive_caps ) ) {
-	        return $primitive_caps;  
+	        return $primitive_caps;
 	    }
 
 	  	// We pass a blank array back, meaning there's no capability required.
@@ -864,7 +878,7 @@ class CC_Group_Pages {
 	 * @since    1.0.0
 	 */
 	public function show_users_own_attachments( $wp_query_obj ) {
-	 
+
 		// The image library is populated via an AJAX request, so we'll check for that
 		if( isset( $_POST['action'] ) && $_POST['action'] == 'query-attachments' ) {
 
