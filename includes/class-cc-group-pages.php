@@ -371,6 +371,7 @@ class CC_Group_Pages {
 		// Depends on BP_Group_Hierarchy being active
 		if  ( ( $parent_group_id = $group_object->vars['parent_id'] )  &&  
 				( $parent_group_term = get_term_by( 'slug', $ccgp_class->create_taxonomy_slug( $parent_group_id ), 'ccgp_related_groups' ) ) 
+				( $parent_group_term = get_term_by( 'slug', $this->create_taxonomy_slug( $parent_group_id ), 'ccgp_related_groups' ) )
 			) {
 			$term_args['parent'] = (int) $parent_group_term->term_id;
 		}
