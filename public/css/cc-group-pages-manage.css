@@ -1,0 +1,49 @@
+.standard-form .tab-details {
+    box-sizing: border-box;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    border: 1px solid #CCC;
+    padding: 5px;
+}
+.tab-details .tab-title {
+    display: inline;
+}
+.standard-form .tab-details label {
+    margin-top: .4em;
+}
+.tab-details .info {
+    font-size: .9em;
+    font-style: italic;
+    color: #666;
+    margin-bottom: 0;
+}
+.tab-details .details-pane {
+    display: none;
+}
+.page-list {
+    margin-top: .5em;
+}
+.page-list-header {
+    display: inline;
+}
+.standard-form .page-list .sortable li {
+    margin: 5px 0;
+    padding: .2em 10px;
+    border:2px solid #EEE;
+}
+.toggle-details-pane {
+    float: right;
+    /*margin-right: 10px;*/
+}
+.standard-form .page-list .sortable .ui-draggable-drop-zone {
+    border:2px dashed #CCC;
+    height: 24.4px;
+    background-color: #F8FDCD;
+}
+.sortable {
+    /* The ul needs to have minimum height so that there's always a drop target. */
+    min-height: 24.4px;
+}
+.draggable {
+    cursor: move;
+}

@@ -29,7 +29,12 @@
 	        items: "> li",
 	        placeholder: "ui-draggable-drop-zone",
 	        // revert: true
-	        stop: populatePageOrder,
+	        stop: function(event, ui) {
+	        	console.log(ui);
+		        ui.item.first().removeAttr('style'); // undo styling set by jQueryUI while the items are being transported.
+		        populatePageOrder();
+		        updatePageVisibility();
+		    }
 	    });
 	    $( ".draggable" ).draggable({
 	        connectToSortable: ".sortable",
@@ -45,16 +50,68 @@
                 });
         });
         $( '#pages-order' ).val( $.param( completeOrder ) );
+        updatePageVisibility();
         console.log( 'page order in populatePageOrder' );
         console.log( $.param( completeOrder ) );
     }
 
+    function updatePageVisibility() {
+    	// Loop through each fieldset
+    	$( '.tab-details' ).not('#unused-pages').each(function(){
+			var tab_option = jQuery( this ).find(".tab-visibility option:selected");
+			var tab_access = tab_option.data("level");
+			var tab_value = tab_option.val();
+			var i = 1;
+
+			$( this ).find( ".page-visibility" ).each( function() {
+				// Inside this each(), "this" is the page-vis select.
+				// First pages must have the same access level as the tab.
+				if ( i == 1 ) {
+		            jQuery( this ).val( tab_value );
+		            // Disable all other options.
+		            jQuery( this ).find("option").not(":selected").prop("disabled", true);
+		            // Hmm. Let's also hide the select.
+		            jQuery( this ).closest(".page-visibility-control").hide();
+				} else {
+    	            jQuery( this ).closest(".page-visibility-control").show();
+		            // Other pages must have an access level that is greater than the section's.
+		            var page_access = jQuery( this ).find(":selected").data("level");
+		            if ( page_access < tab_access ) {
+		                jQuery( this ).val( tab_value );
+		            }
+		            // Disable options that are less restrictive.
+		            jQuery( this ).find("option").each( function() {
+      					// Inside this each(), "this" is a single option from the select.
+		                if ( jQuery(this).data("level") < tab_access ) {
+		                    jQuery(this).prop("disabled", true);
+		                } else {
+		                    jQuery(this).prop("disabled", false);
+		                }
+		            });
+				}
+				i++;
+			});
+		});
+		// Hide the visibility select if the page is in the bullpen.
+		$("#unused-pages").find(".page-visibility").each( function() {
+			$( this ).closest(".page-visibility-control").hide();
+		});
+	}
+	// function ccgpRefreshTabIDs(){
+	// 	var i = 1;
+	// 	$( '.tab-details' ).not( '#unused-pages' ).each( function() {
+	// 		$(this).attr( 'id', 'tabs-1' + i );
+	// 		i++;
+	// 	});
+
+	// }
 	function addPageSuccess( data ) {
 		console.log( data );
 		$( '#'+data.target_list ).append( ccgpPage( data ) );
 		//We have to reinitialize the sortable. Ugh.
 		initializeSortable();
 		populatePageOrder();
+		updatePageVisibility();
 	}
 	function addPageError( data ) {}
 	function ccgpGetPageDetails( target_list, post_id ) {
@@ -107,65 +164,95 @@
 	}
 	function getNextTabID(){
 		var increment = [ 0 ];
-		jQuery('.tab-details').each( function() {
-		  increment.push( jQuery(this).attr("id").replace('tabs-','') );
+		jQuery('.tab-details').not('#unused-pages').each( function() {
+			increment.push( jQuery(this).attr("id").replace('tabs-','') );
 		});
+		console.log( increment );
 		return Math.max.apply(Math, increment) + 1;
 	}
 	function ccgpCreateTabonClick( event ) {
-		console.log(' clicked it ');
-		// Stop the form from submitting normally
 		event.preventDefault();
 		var id = getNextTabID(),
 			details = defaultTabDetails;
 
 		console.log( 'data for tab creation on click' );
-		console.log( id );
+		// console.log( id );
 		console.log( details );
 		ccgpCreateTab( id, details );
-
-
+		// Expand the details pane for the new tab.
+		$( "#tabs-" + id ).find(".details-pane").show();
 	}
 	function ccgpCreateTab( id, details) {
-		var tabData = { 	"tab_id": id,
+		var tabData = { "tab_id": id,
 						"details": details,
 						"access_levels": access_levels
 					};
 		console.log( 'data for tab creation on init' );
 		console.log( tabData );
 
-		$( '#tabs-container' ).append( ccgpTab( tabData ) );
+		$( '#unused-pages' ).before( ccgpTab( tabData ) );
+		initializeSortable();
+		populatePageOrder();
+		maybeHideAddTabButton();
 	}
-	function ccgpSetTabValues( id, details) {
-		for ( var field in details ) {
-			// We're doing this because the AJAX-produced input fields don't show their values.
-			$( '#ccgp-tab-'+id+'-'+field ).val( details[field] );
-		}
+	function ccgpRemoveTab( e, that) {
+		var target = e.target;
+		$( target ).parents( '.tab-details' ).fadeOut(400, function(){
+			// Move the pages from the removed tab to the bullpen.
+			var items = $(this).find('.draggable');
+			$('#unused-page-list').append( items );
+			// Remove the fieldset from the DOM.
+			$(this).remove();
+			// Refresh the page order.
+			initializeSortable();
+			populatePageOrder();
+			maybeShowAddTabButton();
+		});
 	}
+	// function ccgpSetTabValues( id, details) {
+	// 	for ( var field in details ) {
+	// 		// We're doing this because the AJAX-produced input fields don't show their values.
+	// 		$( '#ccgp-tab-'+id+'-'+field ).val( details[field] );
+	// 	}
+	// }
 
-	function ccgpBuildTabsOnInit( data ){
-		console.log( 'incoming init info' );
-		console.log(data);
-		if ( data === Object(data) ) {
-			for ( var id in data ) {
-				ccgpCreateTab( id, data[id] );
-				ccgpSetTabValues( id, data[id] );
-				ccgpBuildPagesOnInit( id, data[id] )
-			}
+	// function ccgpBuildTabsOnInit( data ){
+	// 	console.log( 'incoming init info' );
+	// 	console.log(data);
+	// 	if ( data === Object(data) ) {
+	// 		for ( var id in data ) {
+	// 			ccgpCreateTab( id, data[id] );
+	// 			ccgpSetTabValues( id, data[id] );
+	// 			ccgpBuildPagesOnInit( id, data[id] )
+	// 		}
+	// 	}
+	// }
+	// function ccgpBuildPagesOnInit( tabID, data ){
+	// 	console.log( 'incoming page init info' );
+	// 	console.log(data);
+	// 	if ( data.pages === Object(data.pages) ) {
+	// 		var pages = data.pages
+	// 		console.log( 'pages object?' );
+	// 		console.log( pages );
+	// 		for ( var i in pages ) {
+	// 			console.log( 'post_id?' );
+	// 			console.log( pages[i].post_id );
+	// 			ccgpGetPageDetails( tabID, pages[i].post_id );
+	// 		}
+	// 	}
+	// }
+	// We can only handle 4 tabs total, so don't allow the user to add more than that.
+	function maybeHideAddTabButton(){
+		// The Bullpen is the fifth fieldset
+		if ( $(".tab-details").length >=5 ) {
+			$("#ccgp-add-tab").hide();
 		}
 	}
-	function ccgpBuildPagesOnInit( tabID, data ){
-		console.log( 'incoming page init info' );
-		console.log(data);
-		if ( data.pages === Object(data.pages) ) {
-			var pages = data.pages
-			console.log( 'pages object?' );
-			console.log( pages );
-			for ( var i in pages ) {
-				console.log( 'post_id?' );
-				console.log( pages[i].post_id );
-				ccgpGetPageDetails( tabID, pages[i].post_id );
-			}
+	// If less than 4 tabs total, the user may add another.
+	function maybeShowAddTabButton(){
+		// The Bullpen is the fifth fieldset
+		if ( $(".tab-details").length < 5 ) {
+			$("#ccgp-add-tab").show();
 		}
 	}
 
@@ -176,6 +263,14 @@
         e.preventDefault();
         $(this).siblings( ".details-pane" ).toggle();
     });
+    $( '.standard-form' ).on( 'change', '.tab-visibility', updatePageVisibility );
+    $( '.standard-form' ).on( 'click', '.remove-tab', function(e){
+    	e.preventDefault();
+    	var that = $(this);
+	    if ( window.confirm("Are you sure you would like to remove that tab?") ){
+	       ccgpRemoveTab(e, that);
+	    }
+    } );
 
     window.partial = function(which, data) {
         var tmpl = $('#' + which + '-partial').html();

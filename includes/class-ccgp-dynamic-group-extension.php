@@ -14,30 +14,43 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
 
 // Only bother when in a single group
     if ( $group_id = bp_get_current_group_id() ) {
+        $tab_structure = array();
 
-        $tab_structure = ccgp_get_page_order( $group_id, $jsonify = false );
-        $towrite = PHP_EOL . 'tab structure in dynamic class generator: ' . print_r( $tab_structure, TRUE );
-        $fp = fopen('ccgp-dynamic-classes.txt', 'a');
-        fwrite($fp, $towrite);
-        fclose($fp);
+        if ( (bool) groups_get_groupmeta( $group_id, "ccgp_is_enabled" ) ) {
+            $tab_structure = ccgp_get_page_order( $group_id, $jsonify = false );
+        }
+        // $towrite = PHP_EOL . 'tab structure in dynamic class generator: ' . print_r( $tab_structure, TRUE );
+        // $fp = fopen('ccgp-dynamic-classes.txt', 'a');
+        // fwrite($fp, $towrite);
+        // fclose($fp);
 
         if ( ! empty( $tab_structure ) && is_array( $tab_structure )  ) {
+            // We'll need an iterator to choose the right extension.
+            $j = 1;
 
             foreach ( $tab_structure as $key => $tab_details ) {
 
+                // Class names can't be declared dynamically, so we'll just have to set a maximum and loop them with hardcoded class names.
 
-                // Class names can't be declared dynamically, so maybe we'll just have to set a maximum and loop them with hardcoded class names.
+                if ( $j == 1 ) {
 
-                if ( $key == 1 ) {
                     class CCGP_Pages_Tab_One_Extension extends BP_Group_Extension {
                         function __construct() {
 
-                        $tab_details = ccgp_get_group_extension_params( 1 );
-                        $args = array(
+                            $tab_details = ccgp_get_group_extension_params( 1 );
+
+                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
+                            if ( 'mod' == $tab_details['visibility'] ) {
+                                $visibility = array( 'mod', 'admin' );
+                            } else {
+                                $visibility = $tab_details['visibility'];
+                            }
+
+                            $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
-                                    'access'            => $tab_details['visibility'], // BP 2.1
-                                    'show_tab'          => $tab_details['visibility'], // BP 2.1
+                                    'access'            => $visibility, // BP 2.1
+                                    'show_tab'          => $visibility, // BP 2.1
                                     // 'nav_item_position' => 43,
                                     'screens' => array(
                                         'edit' => array(
@@ -51,11 +64,11 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                         ),
                                     ),
                                 );
-                            $towrite = PHP_EOL . 'tab details: ' . print_r( $tab_details, TRUE );
-                            $towrite .= PHP_EOL . 'init args: ' . print_r( $args, TRUE );
-                            $fp = fopen('ccgp-dynamic-classes.txt', 'a');
-                            fwrite($fp, $towrite);
-                            fclose($fp);
+                            // $towrite = PHP_EOL . 'tab details: ' . print_r( $tab_details, TRUE );
+                            // $towrite .= PHP_EOL . 'init args: ' . print_r( $args, TRUE );
+                            // $fp = fopen('ccgp-dynamic-classes.txt', 'a');
+                            // fwrite($fp, $towrite);
+                            // fclose($fp);
                             parent::init( $args );
 
                         }
@@ -76,23 +89,31 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          */
                         function display( $group_id = null ) {
                             // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages' );
+                            bp_get_template_part( 'groups/single/pages/pages' );
                         }
 
                     }
                     bp_register_group_extension( 'CCGP_Pages_Tab_One_Extension' );
-                } else if ( $key == 2 ) {
+
+                } else if ( $j == 2 ) {
+
                     class CCGP_Pages_Tab_Two_Extension extends BP_Group_Extension {
 
                         function __construct() {
 
-                        $tab_details = ccgp_get_group_extension_params( 2 );
+                            $tab_details = ccgp_get_group_extension_params( 2 );
+                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
+                            if ( 'mod' == $tab_details['visibility'] ) {
+                                $visibility = array( 'mod', 'admin' );
+                            } else {
+                                $visibility = $tab_details['visibility'];
+                            }
 
-                        $args = array(
+                            $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
-                                    'access'            => $tab_details['visibility'], // BP 2.1
-                                    'show_tab'          => $tab_details['visibility'], // BP 2.1
+                                    'access'            => $visibility, // BP 2.1
+                                    'show_tab'          => $visibility, // BP 2.1
                                     // 'nav_item_position' => 43,
                                     'screens' => array(
                                         'edit' => array(
@@ -126,23 +147,31 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          */
                         function display( $group_id = null ) {
                             // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages' );
+                            bp_get_template_part( 'groups/single/pages/pages' );
                         }
 
                     }
                     bp_register_group_extension( 'CCGP_Pages_Tab_Two_Extension' );
-                } else if ( $key == 3 ) {
+
+                } else if ( $j == 3 ) {
+
                     class CCGP_Pages_Tab_Three_Extension extends BP_Group_Extension {
 
                         function __construct() {
 
-                        $tab_details = ccgp_get_group_extension_params( 3 );
+                            $tab_details = ccgp_get_group_extension_params( 3 );
+                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
+                            if ( 'mod' == $tab_details['visibility'] ) {
+                                $visibility = array( 'mod', 'admin' );
+                            } else {
+                                $visibility = $tab_details['visibility'];
+                            }
 
-                        $args = array(
+                            $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
-                                    'access'            => $tab_details['visibility'], // BP 2.1
-                                    'show_tab'          => $tab_details['visibility'], // BP 2.1
+                                    'access'            => $visibility, // BP 2.1
+                                    'show_tab'          => $visibility, // BP 2.1
                                     // 'nav_item_position' => 43,
                                     'screens' => array(
                                         'edit' => array(
@@ -176,23 +205,31 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          */
                         function display( $group_id = null ) {
                             // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages' );
+                            bp_get_template_part( 'groups/single/pages/pages' );
                         }
 
                     }
                     bp_register_group_extension( 'CCGP_Pages_Tab_Three_Extension' );
-                } else if ( $key == 4 ) {
+
+                } else if ( $j == 4 ) {
+
                     class CCGP_Pages_Tab_Four_Extension extends BP_Group_Extension {
 
                         function __construct() {
 
-                        $tab_details = ccgp_get_group_extension_params( 4 );
+                            $tab_details = ccgp_get_group_extension_params( 4 );
+                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
+                            if ( 'mod' == $tab_details['visibility'] ) {
+                                $visibility = array( 'mod', 'admin' );
+                            } else {
+                                $visibility = $tab_details['visibility'];
+                            }
 
-                        $args = array(
+                            $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
-                                    'access'            => $tab_details['visibility'], // BP 2.1
-                                    'show_tab'          => $tab_details['visibility'], // BP 2.1
+                                    'access'            => $visibility, // BP 2.1
+                                    'show_tab'          => $visibility, // BP 2.1
                                     // 'nav_item_position' => 43,
                                     'screens' => array(
                                         'edit' => array(
@@ -226,20 +263,30 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          */
                         function display( $group_id = null ) {
                             // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages' );
+                            bp_get_template_part( 'groups/single/pages/pages' );
                         }
 
                     }
                     bp_register_group_extension( 'CCGP_Pages_Tab_Four_Extension' );
                 }
-
+                $j++;
             } // end foreach
 
         } // if ( ! empty( $tab_structure ) && is_array( $tab_structure )  ) :
     } // if ( bp_is_group() ) :
 } // class_exists( 'BP_Group_Extension' )
 
-function ccgp_get_group_extension_params( $key ) {
+
+/**
+* Get the parameters for a single tab.
+* Used when creating the tab within the BP_Group_Extension class extension, 
+* since variables cannot be passed into the class.
+* 
+* @since 1.0.0
+*/
+function ccgp_get_group_extension_params( $position ) {
+    // Since we're talking positions, not keys, we'll use array_slice to get one piece only
     $tab_structure = ccgp_get_page_order( bp_get_current_group_id(), $jsonify = false );
-    return $tab_structure[$key];
+    $tab_details = array_slice( $tab_structure, $position - 1, 1 );
+    return current( $tab_details );
 }
