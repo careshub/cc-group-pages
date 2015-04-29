@@ -23,8 +23,8 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    CC Group Pages
- * @subpackage CC Group Pages/includes
+ * @package    CC_Group_Pages
+ * @subpackage CC_Group_Pages/includes
  * @author     Your Name <email@example.com>
  */
 class CC_Group_Pages {
@@ -105,19 +105,19 @@ class CC_Group_Pages {
 		// Add our templates to BuddyPress' template stack.
 		add_filter( 'bp_get_template_stack', array( $this, 'add_template_stack'), 10, 1 );
 
-		// Remove the shortcode filter on post edit, otherwise, shortcodes are 
+		// Remove the shortcode filter on post edit, otherwise, shortcodes are
 		// consumed as though this is a display context.
 		add_action( 'bp_init', array( $this, 'remove_shortcode_filter_on_settings_screen' ), 11 );
 
 		// Catch saves.
 		add_action( 'bp_init', array( $this, 'save_post' ) );
-		// Modify permalinks so that they point to the story as persented in the origin group
+		// Modify permalinks so that they point to the story shown in the origin group.
 		add_filter( 'post_type_link', array( $this, 'permalink_filter'), 10, 2);
 
-		/* Filter "map_meta_caps" to let our users do things they normally can't, like upload media */
+		// Filter "map_meta_caps" to let our users do things they normally can't, like upload media.
 		add_action( 'bp_init', array( $this, 'add_mmc_filter') );
 
-		/* Only allow users to see their own items in the media library uploader. */
+		// Only allow users to see their own items in the media library uploader.
 		add_action( 'pre_get_posts', array( $this, 'show_users_own_attachments') );
 
 
@@ -316,7 +316,7 @@ class CC_Group_Pages {
 	}
 
 	/**
-	 * Get the customized tab name.
+	 * Get the tab name for the main tab (manage pages).
 	 *
 	 * @since     1.0.0
 	 * @return    string    The text of the tab name.
@@ -354,7 +354,7 @@ class CC_Group_Pages {
 
 		$setting = 'noone';
 
-		// I think these should always be "for members only" pages, to diff from narratives and bp-docs.
+		// The main tab is a content admin page
 		if ( $this->get_enabled_status( $group_id ) ) {
 			$setting = array( 'mod', 'admin' );
 		}
@@ -366,7 +366,7 @@ class CC_Group_Pages {
 	 * Create or update the taxonomy term specific to group.
 	 *
  	 * @since     1.0.0
-	 * @return integer
+	 * @return    integer
 	 */
 	public function update_group_term( $group_id = false ) {
 		$group_id = $group_id ? $group_id : bp_get_current_group_id();
@@ -396,7 +396,7 @@ class CC_Group_Pages {
 	}
 
 	/**
-	 * Get the taxonomy term specific to group.
+	 * Get the taxonomy term specific to the group.
 	 *
 	 * @since     1.0.0
 	 * @return integer
@@ -411,6 +411,7 @@ class CC_Group_Pages {
 		}
 
 	}
+
 	/**
 	 * Build the taxonomy slug.
 	 *
@@ -421,11 +422,12 @@ class CC_Group_Pages {
 		$group_id = ( $group_id ) ?  $group_id : bp_get_current_group_id();
 		return 'ccgp_related_group_' . $group_id;
 	}
+
 	/**
-	 * Reverse lookup the group id from the term.
+	 * Given a post id, find the parent tab's slug.
 	 *
 	 * @since     1.0.0
-	 * @return string
+	 * @return    string
 	 */
 	public function get_tab_slug_from_group_post_ids( $group_id, $post_id ){
 		$page_order = ccgp_get_page_order( $group_id );
@@ -466,7 +468,7 @@ class CC_Group_Pages {
 	}
 
 	/**
-	 * Update group meta settings.
+	 * Update group meta settings from $_POST.
 	 *
 	 * @since  1.0.0
 	 * @return boolean
@@ -507,9 +509,12 @@ class CC_Group_Pages {
 		}
 	}
 
+
 	/**
-	 * Helper functions to determine what is going on/what action is being requested.
-	 * @return bool
+	 * Is the requested screen part of this plugin?
+	 *
+	 * @since     1.0.0
+	 * @return    bool
 	 */
 	public function is_component() {
 		$is_component = false;
@@ -526,7 +531,7 @@ class CC_Group_Pages {
 
 	/**
 	 * Is the requested screen the "manage pages" screen?
-	 * This is the base screen for the plugin. It is only visible to group admins, 
+	 * This is the base screen for the plugin. It is only visible to group admins,
 	 * and is a good ToC for editing page content.
 	 *
 	 * @since     1.0.0
@@ -546,7 +551,7 @@ class CC_Group_Pages {
 	 *
 	 * @since     1.0.0
 	 * @return    bool
-	 */	
+	 */
 	public function is_single_post( $action_variable = null ){
 		$is_single_post = false;
 		if ( empty( $action_variable ) ) {
@@ -566,7 +571,7 @@ class CC_Group_Pages {
 	 *
 	 * @since     1.0.0
 	 * @return    bool
-	 */	
+	 */
 	public function is_post_edit(  $action_variable = null  ){
 		if ( empty( $action_variable ) ) {
 			$action_variable = bp_action_variable();
@@ -583,7 +588,7 @@ class CC_Group_Pages {
 	 *
 	 * @since     1.0.0
 	 * @return    bool
-	 */	
+	 */
 	public function is_group_manage(){
 		if ( bp_is_group() && bp_is_current_action( 'admin' ) && bp_action_variable( 0 ) == $this->get_plugin_slug() ) {
 			return true;
@@ -596,7 +601,7 @@ class CC_Group_Pages {
 	 *
 	 * @since     1.0.0
 	 * @return    bool
-	 */	
+	 */
 	public function current_user_can_post( $post_id = null ){
 		// if ( current_user_can( 'bp_moderate' ) ) {
 		// 	return true;
@@ -637,7 +642,7 @@ class CC_Group_Pages {
 	 *
 	 * @since     1.0.0
 	 * @return    bool
-	 */	
+	 */
 	public function current_user_can_manage(){
 		if ( current_user_can( 'delete_pages' ) ) {
 			return true;
@@ -746,7 +751,13 @@ class CC_Group_Pages {
 	<?php
 	}
 
-	// A catch-action-type of save
+	/**
+	 * Build the post editing form.
+	 * A catch-action-type of save
+	 *
+	 * @since     1.0.0
+	 * @return    void (@TODO: Should this return a boolean?)
+	 */
 	public function save_post( $group_id = false ) {
 		// Make sure this action should run
 		// Only on post edit page, and only when an id is specified
@@ -957,7 +968,7 @@ class CC_Group_Pages {
 	}
 
 	/* Permalinks ***********************************************************/
-	
+
 	/**
 	 * Get the permalink of the requested tab.
 	 *
@@ -973,12 +984,24 @@ class CC_Group_Pages {
 
 	    return apply_filters( 'ccgp_base_permalink', $permalink, $group_id );
 	}
+
+	/**
+	 * Get the permalink of the manage pages tab for a group.
+	 *
+	 * @return string: URI
+	 */
 	public function get_create_permalink( $group_id = false ){
 		$group_id = $group_id ? $group_id : bp_get_current_group_id();
 		$group_slug = bp_get_group_permalink( groups_get_group( array( 'group_id' => $group_id ) ) );
 	    $permalink = $group_slug . trailingslashit( $this->get_manage_pages_slug() ) . trailingslashit('edit' );
 	    return apply_filters( 'ccgp_create_permalink', $permalink, $group_id );
 	}
+
+	/**
+	 * Get the permalink for the edit screen of a specific post.
+	 *
+	 * @return string: URI
+	 */
 	public function get_edit_permalink( $post_id = 0 ){
 		if ( ! $post_id ) {
 			return $this->get_create_permalink();
@@ -1022,7 +1045,7 @@ class CC_Group_Pages {
 	 * @since    1.1.0
 	 */
 	public function add_template_stack( $templates ) {
-	    // If we're on a page of our plugin, then we add our path to the 
+	    // If we're on a page of our plugin, then we add our path to the
 	    // template path array. This allows bp_get_template_part to work.
 	    if ( $this->is_component() ) {
 	    	$template_directory = trailingslashit( $this->get_template_directory() );

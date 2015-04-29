@@ -64,7 +64,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
 					<input type="text" name="ccgp_tab_label" id="ccgp_tab_label" value="<?php echo esc_html( $tab_label ); ?>" />
 				</p> -->
                 <?php
-                // Only show the form if the plugin is enabled. 
+                // Only show the form if the plugin is enabled.
                 // Enabling the plugin creates the necessary group term.
                 if ( $is_enabled ) {
                     ccgp_setup_settings_form( $group_id );
@@ -157,8 +157,8 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
                 // OK? Add this tab's slug to the forbidden slugs list.
                 $verboten[] = $ordered_tabs[$tab_key]['slug'];
 
-                // We need to make sure that a tab's visibility isn't too permissive 
-                // if the group is hidden. 
+                // We need to make sure that a tab's visibility isn't too permissive
+                // if the group is hidden.
                 // It's OK for private group pages to be public, though.
                 if ( $group_status == 'hidden' ) {
                     if ( in_array( $ordered_tabs[$tab_key]['visibility'], array( 'anyone', 'loggedin' ) ) ) {
@@ -320,6 +320,13 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
     bp_register_group_extension( 'CC_Group_Pages_Extension' );
 
 endif; // class_exists( 'BP_Group_Extension' )
+
+/**
+ * Output the tab settings form.
+ *
+ * @since  1.0.0
+ * @return html
+ */
 function ccgp_setup_settings_form( $group_id ){
     $page_order = ccgp_get_page_order( $group_id, $jsonify = false );
     $used_pages = array();
@@ -551,7 +558,7 @@ function ccgp_get_access_settings_options() {
 }
 
 /**
- * Make sure that the page access settings are at least as restrictive as their 
+ * Make sure that the page access settings are at least as restrictive as their
  * parent tab.
  *
  * @since     1.0.0

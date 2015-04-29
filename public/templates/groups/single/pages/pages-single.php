@@ -23,7 +23,7 @@ $ccgp_class = new CC_Group_Pages();
 		<header class="entry-header">
 
 				<?php //the_post_thumbnail(); ?>
-				<h1 class="entry-title"><?php the_title(); ?></h1>
+				<!-- <h1 class="entry-title"><?php //the_title(); ?></h1> -->
 
 			<?php //if ( comments_open() ) : ?>
 				<!-- <div class="comments-link">
