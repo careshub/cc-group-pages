@@ -54,7 +54,7 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-cc-group-pages.php';
 /**
  * Load the main class
  *
- * @since    1.0.0 
+ * @since    1.0.0
  */
 function cc_group_pages_main_class_init() {
 	// The main class
@@ -65,11 +65,21 @@ function cc_group_pages_main_class_init() {
 add_action( 'bp_include', 'cc_group_pages_main_class_init' );
 
 /**
- * Load the BuddyPress Group Extension Class
+ * Load the BuddyPress Group Extension Class for our main class
  *
- * @since    1.0.0 
+ * @since    1.0.0
  */
 function cc_group_pages_extension_class_init() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-ccgp-group-extension.php';
 }
 add_action( 'bp_include', 'cc_group_pages_extension_class_init', 22 );
+
+/**
+ * Load our dynamic buddypress extension class
+ *
+ * @since    1.0.0
+ */
+function cc_group_pages_dynamic_extension_class_init() {
+    require_once plugin_dir_path( __FILE__ ) . 'includes/class-ccgp-dynamic-group-extension.php';
+}
+add_action( 'bp_init', 'cc_group_pages_dynamic_extension_class_init', 9 );

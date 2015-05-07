@@ -9,6 +9,8 @@
 // On the single view, we want WP to ignore any more tags.
 global $more;
 $more = 1;
+
+$ccgp_class = new CC_Group_Pages();
 ?>
 
 	<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -21,7 +23,7 @@ $more = 1;
 		<header class="entry-header">
 
 				<?php //the_post_thumbnail(); ?>
-				<h1 class="entry-title"><?php the_title(); ?></h1>
+				<!-- <h1 class="entry-title"><?php //the_title(); ?></h1> -->
 
 			<?php //if ( comments_open() ) : ?>
 				<!-- <div class="comments-link">
@@ -30,7 +32,7 @@ $more = 1;
 			<?php //endif; // comments_open() ?>
 		</header><!-- .entry-header -->
 
-		<div class="entry-content">
+		<div class="entry-content clear">
 			<?php the_content( __( 'Read more', 'twentytwelve' ) ); ?>
 			<?php wp_link_pages( array( 'before' => '<div class="page-links">' . __( 'Pages:', 'twentytwelve' ), 'after' => '</div>' ) ); ?>
 		</div><!-- .entry-content -->
@@ -69,8 +71,15 @@ $more = 1;
 					</div><!-- .author-description -->
 				</div><!-- .author-info -->
 			<?php endif; ?>
+			<?php
+			if ( $ccgp_class->current_user_can_post( get_the_ID() ) ) {
+				echo '&emsp;';
+				ccgp_the_post_edit_link( get_the_ID() );
+			}
+			?>
+			<div class="post-actions">
+				<?php do_action( 'ccgp_post_actions' ) ; ?>
+			</div>
 		</footer><!-- .entry-meta -->
-		<div class="post-actions">
-			<?php do_action( 'ccgp_post_actions' ) ; ?>
-		</div>
+
 	</article><!-- #post -->

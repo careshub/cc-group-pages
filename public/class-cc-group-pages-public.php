@@ -98,4 +98,116 @@ class CC_Group_Pages_Public {
 
 	}
 
+	/**
+	 * Register the stylesheets for the group manage pane.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_manage_styles() {
+
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/cc-group-pages-manage.css', array(), $this->version, 'all' );
+	}
+	/**
+	 * Register the scripts for the group's manage pane.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_group_manage_scripts() {
+
+		wp_enqueue_script( 'jquery-ui-sortable' );
+		wp_enqueue_script( 'jquery-ui-draggable' );
+		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/cc-group-pages-edit.js', array( 'jquery' ), $this->version, false );
+
+		wp_enqueue_script(
+			"ccgp-manage",
+			plugin_dir_url( __FILE__ ) . 'js/cc-group-pages-manage.js',
+			array( "wp-util" ),
+			$this->version,
+			true //makes sure this is enqueued in the footer
+		);
+		// Print out a nonce so we can verify this request.
+		wp_localize_script( "ccgp-manage", "ccgpAJAXNonce", wp_create_nonce( "ccgp-manage-" . bp_get_current_group_id() ) );
+	}
+
+	/**
+	 * Include the needed js templates in the page footer.
+	 *
+	 * @since    1.0.0
+	 */
+	public function include_group_manage_js_templates() {
+		require_once plugin_dir_path( __FILE__ ) . 'templates/groups/single/pages/manage-js-templates.php';
+	}
+
+	/**
+	 * Catch AJAX request for page details.
+	 *
+	 * @since    1.0.0
+	 */
+	public function ccgp_ajax_retrieve_page_details() {
+		$nonce = isset( $_POST["nonce"] ) ? $_POST["nonce"] : "";
+		$group_id = isset( $_POST["group_id"] ) ? (int) $_POST["group_id"] : 0;
+		$post_id = isset( $_POST["post_id"] ) ? (int) $_POST["post_id"] : 0;
+
+		if ( ! wp_verify_nonce( $nonce, "ccgp-manage-" . $group_id ) ) {
+			// If the nonce was invalid, send an error.
+			wp_send_json_error( "This came from the wrong place" );
+		}
+
+		// If the post doesn't exist, create a new one.
+		if ( $post_id == 0 ) {
+			$ccgp_class = new CC_Group_Pages();
+			$group_term = $ccgp_class->get_group_term_id( $group_id );
+
+			if ( ! $group_term ) {
+				wp_send_json_error( $group_term );
+			} else {
+				// Create a new post
+				$post_data = array(
+					'post_title'	=> 'Untitled',
+					'post_status'    => 'draft',
+					'post_type'      => 'cc_group_page',
+					'tax_input'      => array( 'ccgp_related_groups' => $group_term ),
+				);
+				$post_id = wp_insert_post( $post_data );
+			}
+		}
+		$post_details = get_post( $post_id );
+
+		$retval = array(
+			'post_id' => $post_id,
+			'post_title' => $post_details->post_title,
+			'target_list' => $_POST['target_list']
+			);
+
+		// Return the info.
+		wp_send_json_success( $retval );
+	}
+
+	/**
+	 * Catch AJAX request for page order information.
+	 *
+	 * @since    1.0.0
+	 */
+	public function ccgp_ajax_retrieve_page_order() {
+		$nonce = isset( $_POST["nonce"] ) ? $_POST["nonce"] : "";
+		$group_id = isset( $_POST["group_id"] ) ? (int) $_POST["group_id"] : 0;
+
+
+		if ( ! wp_verify_nonce( $nonce, "ccgp-manage-" . $group_id ) ) {
+			// If the nonce was invalid, send an error.
+			wp_send_json_error( "This came from the wrong place" );
+		}
+
+		$retval = ccgp_get_page_order( $group_id, $jsonify = false );
+
+			// $towrite = PHP_EOL . 'passed nonce: ';
+			// $towrite .= PHP_EOL . 'get page order, group id: ' . print_r($group_id, TRUE);
+			// $towrite .= PHP_EOL . 'value to send: ' . print_r($retval, TRUE);
+			// $fp = fopen('ccgp-save.txt', 'a');
+			// fwrite($fp, $towrite);
+			// fclose($fp);
+
+		// Send the comment data back to Javascript.
+		wp_send_json_success( $retval );
+	}
 }
