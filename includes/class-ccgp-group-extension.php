@@ -45,7 +45,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
 	     * settings_screen() is the catch-all method for displaying the content
 	     * of the edit, create, and Dashboard admin panels
 	     */
-	    function settings_screen( $group_id = 0 ) {
+	    function edit_screen( $group_id = 0 ) {
 	    	$ccgp_class = new CC_Group_Pages();
         	$is_enabled = $ccgp_class->get_enabled_status( $group_id );
 	    	$tab_label = $ccgp_class->get_tab_label();
@@ -83,7 +83,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
 	     * settings_screen_save() contains the catch-all logic for saving
 	     * settings from the edit, create, and Dashboard admin panels
 	     */
-	    function settings_screen_save( $group_id = 0 ) {
+	    function edit_screen_save( $group_id = 0 ) {
 	    	// Main settings panel
 	    	// @TODO: Fix term creation from wp admin
 
