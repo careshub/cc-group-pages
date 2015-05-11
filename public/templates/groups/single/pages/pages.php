@@ -99,6 +99,7 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 
 	} else if ( $ccgp_class->is_page_management_tab() ) {
 		// This is a flat list of all the group's pages for easy links to editing, etc.
+		$manage_tab_label = $ccgp_class->get_manage_pages_slug();
 		?>
 		<div id="message" class="info">
 			<p class="info">Note: This tab is only accessible to hub admins and moderators.</p>
@@ -114,7 +115,7 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 					<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
 					<?php
 					$tab_label = $ccgp_class->get_tab_label_from_group_post_ids( bp_get_current_group_id(), $post->ID );
-					if ( $tab_label != 'pages' ) {
+					if ( $tab_label != $manage_tab_label ) {
 						echo 'in the tab: ' . $tab_label;
 					} else {
 						echo "not assigned to a tab";

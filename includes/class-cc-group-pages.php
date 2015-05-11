@@ -431,7 +431,7 @@ class CC_Group_Pages {
 	 */
 	public function get_tab_slug_from_group_post_ids( $group_id, $post_id ){
 		$page_order = ccgp_get_page_order( $group_id );
-		$tab_slug = 'pages';
+		$tab_slug = $this->get_manage_pages_slug();
 		foreach( $page_order as $tab_key => $tab_details ) {
 			if ( ! empty( $tab_details['pages'] ) ) {
 				foreach ( $tab_details['pages'] as $page ) {
@@ -453,7 +453,7 @@ class CC_Group_Pages {
 	 */
 	public function get_tab_label_from_group_post_ids( $group_id, $post_id ){
 		$page_order = ccgp_get_page_order( $group_id );
-		$tab_slug = 'pages';
+		$tab_slug = $this->get_manage_pages_slug();
 		foreach( $page_order as $tab_key => $tab_details ) {
 			if ( ! empty( $tab_details['pages'] ) ) {
 				foreach ( $tab_details['pages'] as $page ) {
