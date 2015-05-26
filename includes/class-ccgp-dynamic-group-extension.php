@@ -46,12 +46,14 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
+
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
                                     'show_tab'          => $visibility, // BP 2.1
-                                    // 'nav_item_position' => 43,
+                                    'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
                                             'enabled' => false,
@@ -109,12 +111,14 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
+
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
                                     'show_tab'          => $visibility, // BP 2.1
-                                    // 'nav_item_position' => 43,
+                                    'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
                                             'enabled' => false,
@@ -167,12 +171,14 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
+
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
                                     'show_tab'          => $visibility, // BP 2.1
-                                    // 'nav_item_position' => 43,
+                                    'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
                                             'enabled' => false,
@@ -225,12 +231,14 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
+
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
                                     'show_tab'          => $visibility, // BP 2.1
-                                    // 'nav_item_position' => 43,
+                                    'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
                                             'enabled' => false,
@@ -279,9 +287,9 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
 
 /**
 * Get the parameters for a single tab.
-* Used when creating the tab within the BP_Group_Extension class extension, 
+* Used when creating the tab within the BP_Group_Extension class extension,
 * since variables cannot be passed into the class.
-* 
+*
 * @since 1.0.0
 */
 function ccgp_get_group_extension_params( $position ) {

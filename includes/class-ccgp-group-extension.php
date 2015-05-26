@@ -360,6 +360,9 @@ function ccgp_setup_settings_form( $group_id ){
                                 <?php } ?>
                             </select>
                         </p>
+                        <label for="ccgp-tab-<?php echo $tab_id; ?>-nav-order" >Placement in Hub Navigation (optional)</label>
+                        <input type="text" id="ccgp-tab-<?php echo $tab_id; ?>-nav-order" name="ccgp-tabs[<?php echo $tab_id; ?>][nav_order]" value="<?php echo $tab_details['nav_order']; ?>"/>
+                        <p class="info">Input a number (1-100) to change this tab&rsquo;s placement in the hub&rsquo;s navigation. Low numbers end up to the left by &ldquo;Home,&rdquo; high numbers end up near &ldquo;Manage.&rdquo;</p>
                         <a href="#" class="remove-tab">Remove this tab</a>
                     </div>
                     <div class="page-list clear">
