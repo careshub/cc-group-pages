@@ -29,7 +29,7 @@ class CC_Group_Pages_CPT_Tax {
 	 */
 	public function register_cpt() {
 
-	    $labels = array( 
+	    $labels = array(
 	        'name' => _x( 'Hub Pages', 'cc_group_page' ),
 	        'singular_name' => _x( 'Hub Page', 'cc_group_page' ),
 	        'add_new' => _x( 'Add New', 'cc_group_page' ),
@@ -44,7 +44,7 @@ class CC_Group_Pages_CPT_Tax {
 	        'menu_name' => _x( 'Hub Pages', 'cc_group_page' ),
 	    );
 
-	    $args = array( 
+	    $args = array(
 	        'labels' => $labels,
 	        'hierarchical' => false,
 	        'description' => 'Information pages displayed in BuddyPress groups.',
@@ -52,7 +52,8 @@ class CC_Group_Pages_CPT_Tax {
 	        'taxonomies' => array( 'ccgp_related_groups' ),
 	        'public' => false,
 	        'show_ui' => true,
-	        'show_in_menu' => true,	        
+	        'show_in_menu' => true,
+	        'menu_position' => 53,
 	        'show_in_nav_menus' => false,
 	        'publicly_queryable' => true,
 	        'exclude_from_search' => true,
@@ -73,7 +74,7 @@ class CC_Group_Pages_CPT_Tax {
 	 */
 	public function register_taxonomy() {
 
-	    $labels = array( 
+	    $labels = array(
 	        'name' => _x( 'CCGP Related Groups', 'ccgp_related_groups' ),
 	        'singular_name' => _x( 'CCGP Related Group', 'ccgp_related_groups' ),
 	        'search_items' => _x( 'Search Related Groups', 'ccgp_related_groups' ),
@@ -91,7 +92,7 @@ class CC_Group_Pages_CPT_Tax {
 	        'menu_name' => _x( 'CCGP Related Groups', 'ccgp_related_groups' ),
 	    );
 
-	    $args = array( 
+	    $args = array(
 	        'labels' => $labels,
 	        'public' => true,
 	        'show_in_nav_menus' => false,
