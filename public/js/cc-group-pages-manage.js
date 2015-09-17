@@ -241,17 +241,17 @@
 	// 		}
 	// 	}
 	// }
-	// We can only handle 4 tabs total, so don't allow the user to add more than that.
+	// We can only handle 5 tabs total, so don't allow the user to add more than that.
 	function maybeHideAddTabButton(){
 		// The Bullpen is the fifth fieldset
-		if ( $(".tab-details").length >=5 ) {
+		if ( $(".tab-details").length >= 6 ) {
 			$("#ccgp-add-tab").hide();
 		}
 	}
-	// If less than 4 tabs total, the user may add another.
+	// If less than 5 tabs total, the user may add another.
 	function maybeShowAddTabButton(){
 		// The Bullpen is the fifth fieldset
-		if ( $(".tab-details").length < 5 ) {
+		if ( $(".tab-details").length < 6 ) {
 			$("#ccgp-add-tab").show();
 		}
 	}
