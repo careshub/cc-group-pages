@@ -226,7 +226,6 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
                     $j++;
                 }
             }
-            //@TODO: if the group is hidden, we need to restrict visibility to group-member or higher.
             $towrite .= PHP_EOL . 'processed to save: ' . print_r( $ordered_tabs, TRUE );
             $towrite .= PHP_EOL . '$_POST: ' . print_r( $_POST, TRUE );
             $fp = fopen('ccgp-saving.txt', 'a');
@@ -349,22 +348,30 @@ function ccgp_setup_settings_form( $group_id ){
                         <label for="ccgp-tab-<?php echo $tab_id; ?>-label" >Tab Label</label>
                         <input type="text" id="ccgp-tab-<?php echo $tab_id; ?>-label" name="ccgp-tabs[<?php echo $tab_id; ?>][label]" value="<?php echo $tab_details['label']; ?>"/>
                         <p class="info">This is the label as shown on the navigation tab</p>
+
                         <label for="ccgp-tab-<?php echo $tab_id; ?>-slug" >Tab Slug (optional)</label>
                         <input type="text" id="ccgp-tab-<?php echo $tab_id; ?>-slug" name="ccgp-tabs[<?php echo $tab_id; ?>][slug]" value="<?php echo $tab_details['slug']; ?>"/>
                         <p class="info">The piece of the URL that follows your group&rsquo;s slug. E.g. http://www.communitycommons.org/groups/my-group/<strong>slug-to-use</strong></p>
-                        <p>
-                            <label for="ccgp-tab-<?php echo $tab_id; ?>-visibility">Access</label>
-                            <select name="ccgp-tabs[<?php echo $tab_id; ?>][visibility]" id="ccgp-tab-<?php echo $tab_id; ?>-visibility" class="tab-visibility">
-                                <?php foreach ( $access_levels as $key => $value ) { ?>
-                                    <option value="<?php echo $value['bp_level'] ?>" <?php selected( $tab_details['visibility'], $value['bp_level'] ); ?> data-level="<?php echo $key; ?>"><?php echo $value['label']; ?></option>
-                                <?php } ?>
-                            </select>
-                        </p>
-                        <label for="ccgp-tab-<?php echo $tab_id; ?>-nav-order" >Placement in Hub Navigation (optional)</label>
-                        <input type="text" id="ccgp-tab-<?php echo $tab_id; ?>-nav-order" name="ccgp-tabs[<?php echo $tab_id; ?>][nav_order]" value="<?php echo $tab_details['nav_order']; ?>"/>
-                        <p class="info">Input a number (1-100) to change this tab&rsquo;s placement in the hub&rsquo;s navigation. Low numbers end up to the left by &ldquo;Home,&rdquo; high numbers end up near &ldquo;Manage.&rdquo;</p>
+
+                        <label for="ccgp-tab-<?php echo $tab_id; ?>-visibility">Visibility</label>
+                        <select name="ccgp-tabs[<?php echo $tab_id; ?>][visibility]" id="ccgp-tab-<?php echo $tab_id; ?>-visibility" class="tab-visibility">
+                            <?php foreach ( $access_levels as $key => $value ) { ?>
+                                <option value="<?php echo $value['bp_level'] ?>" <?php selected( $tab_details['visibility'], $value['bp_level'] ); ?> data-level="<?php echo $key; ?>"><?php echo $value['label']; ?></option>
+                            <?php } ?>
+                        </select>
+
+                        <label><input type="checkbox" name="ccgp-tabs[<?php echo $tab_id; ?>][show-tab]" id="ccgp-tab-<?php echo $tab_id; ?>-show-tab" class="show-tab-setting" value="1" <?php checked( $tab_details['show-tab'], '1' ) ?> /> Include this tab in the hub navigation.</label>
+                        <p class="info">(Hiding the tab is non-standard behavior and should be avoided, unless you&rsquo;ve got another navigation method in place.)</p>
+
+                        <div id="navigation-order-<?php echo $tab_id; ?>" class="navigation-order-container <?php if ( ! isset( $tab_details['show-tab'] ) ) { echo 'toggled-off'; } ?>">
+                            <label for="ccgp-tab-<?php echo $tab_id; ?>-nav-order" >Placement in Hub Navigation (optional)</label>
+                            <input type="text" id="ccgp-tab-<?php echo $tab_id; ?>-nav-order" name="ccgp-tabs[<?php echo $tab_id; ?>][nav_order]" value="<?php echo $tab_details['nav_order']; ?>"/>
+                            <p class="info">Input a number (1-100) to change this tab&rsquo;s placement in the hub&rsquo;s navigation. Low numbers end up to the left by &ldquo;Home,&rdquo; high numbers end up near &ldquo;Manage.&rdquo;</p>
+                        </div>
+
                         <a href="#" class="remove-tab">Remove this tab</a>
                     </div>
+
                     <div class="page-list clear">
                         <h5 class="page-list-header">Pages in this section</h5>
                         <a href="#" class="ccgp-add-page button alignright">Add a new page</a>

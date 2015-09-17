@@ -46,13 +46,19 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                            if ( ! isset( $tab_details['show-tab'] ) ) {
+                                $show_tab = 'noone';
+                            } else {
+                                $show_tab = $visibility;
+                            }
+
                             $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
 
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $visibility, // BP 2.1
+                                    'show_tab'          => $show_tab, // BP 2.1
                                     'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
@@ -78,7 +84,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          * settings_screen() is the catch-all method for displaying the content
                          * of the edit, create, and Dashboard admin panels
                          */
-                        function settings_screen( $group_id = 0 ) {            }
+                        function settings_screen( $group_id = 0 ) {}
 
                         /**
                          * settings_screen_save() contains the catch-all logic for saving
@@ -111,13 +117,19 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                           if ( ! isset( $tab_details['show-tab'] ) ) {
+                                $show_tab = 'noone';
+                            } else {
+                                $show_tab = $visibility;
+                            }
+
                             $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
 
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $visibility, // BP 2.1
+                                    'show_tab'          => $show_tab, // BP 2.1
                                     'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
@@ -139,7 +151,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          * settings_screen() is the catch-all method for displaying the content
                          * of the edit, create, and Dashboard admin panels
                          */
-                        function settings_screen( $group_id = 0 ) {            }
+                        function settings_screen( $group_id = 0 ) {}
 
                         /**
                          * settings_screen_save() contains the catch-all logic for saving
@@ -171,13 +183,19 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                           if ( ! isset( $tab_details['show-tab'] ) ) {
+                                $show_tab = 'noone';
+                            } else {
+                                $show_tab = $visibility;
+                            }
+
                             $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
 
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $visibility, // BP 2.1
+                                    'show_tab'          => $show_tab, // BP 2.1
                                     'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
@@ -199,7 +217,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          * settings_screen() is the catch-all method for displaying the content
                          * of the edit, create, and Dashboard admin panels
                          */
-                        function settings_screen( $group_id = 0 ) {            }
+                        function settings_screen( $group_id = 0 ) {}
 
                         /**
                          * settings_screen_save() contains the catch-all logic for saving
@@ -231,13 +249,19 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                                 $visibility = $tab_details['visibility'];
                             }
 
+                           if ( ! isset( $tab_details['show-tab'] ) ) {
+                                $show_tab = 'noone';
+                            } else {
+                                $show_tab = $visibility;
+                            }
+
                             $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
 
                             $args = array(
                                     'slug'              => $tab_details['slug'],
                                     'name'              => $tab_details['label'],
                                     'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $visibility, // BP 2.1
+                                    'show_tab'          => $show_tab, // BP 2.1
                                     'nav_item_position' => $tab_nav_order,
                                     'screens' => array(
                                         'edit' => array(
@@ -259,7 +283,7 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
                          * settings_screen() is the catch-all method for displaying the content
                          * of the edit, create, and Dashboard admin panels
                          */
-                        function settings_screen( $group_id = 0 ) {            }
+                        function settings_screen( $group_id = 0 ) {}
 
                         /**
                          * settings_screen_save() contains the catch-all logic for saving

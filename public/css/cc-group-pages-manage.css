@@ -47,3 +47,6 @@
 .draggable {
     cursor: move;
 }
+.toggled-off {
+    display: none;
+}

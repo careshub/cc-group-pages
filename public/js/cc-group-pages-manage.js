@@ -271,6 +271,9 @@
 	       ccgpRemoveTab(e, that);
 	    }
     } );
+    $( '.standard-form' ).on( 'change', '.show-tab-setting', function( e ) {
+        $(this).parent().siblings( ".navigation-order-container" ).toggleClass( 'toggled-off' );
+    });
 
     window.partial = function(which, data) {
         var tmpl = $('#' + which + '-partial').html();
