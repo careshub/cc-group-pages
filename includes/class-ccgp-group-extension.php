@@ -331,9 +331,7 @@ function ccgp_setup_settings_form( $group_id ){
     $used_pages = array();
     $access_levels = ccgp_get_access_settings_options();
     ?>
-    <?php if ( count( $page_order ) < 4 ) { ?>
-        <a href="#" id="ccgp-add-tab" class="button">Add a new tab</a>
-    <?php } ?>
+    <a href="#" id="ccgp-add-tab" class="button"<?php if ( count( $page_order ) > 4 ) { echo ' style="display:none;"'; } ?>>Add a new tab</a>
     <div id="tabs-container" class="clear clear-both">
         <?php if ( ! empty( $page_order ) && is_array( $page_order ) ) {
             foreach ( $page_order as $tab_id => $tab_details ) { ?>
