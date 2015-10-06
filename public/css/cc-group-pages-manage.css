@@ -20,6 +20,9 @@
 .tab-details .details-pane {
     display: none;
 }
+.details-pane input {
+    width: 96%;
+}
 .page-list {
     margin-top: .5em;
 }

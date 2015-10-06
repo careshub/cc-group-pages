@@ -568,6 +568,26 @@ function ccgp_get_access_settings_options() {
 }
 
 /**
+ * Output a human readable string of a specific access settings.
+ *
+ * @since     1.0.0
+ * @return    array
+ */
+function ccgp_get_access_setting_human_readable( $level = 'anyone' ) {
+    $retval = "Anyone";
+
+    $access_levels = ccgp_get_access_settings_options();
+
+    foreach ( $access_levels as $key => $access ) {
+        if ( $access['bp_level'] == $level ) {
+            $retval = $access['label'];
+        }
+    }
+
+    return $retval;
+}
+
+/**
  * Make sure that the page access settings are at least as restrictive as their
  * parent tab.
  *

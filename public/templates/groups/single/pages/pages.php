@@ -120,8 +120,30 @@ if ( class_exists( 'CC_Group_Pages' ) ) :
 					} else {
 						echo "not assigned to a tab";
 					}
-					?> |
-					<?php ccgp_the_post_edit_link( $post->ID ); ?>
+					?> | <?php ccgp_the_post_edit_link( $post->ID ); ?> <br />
+					<span style="color:#777;">Access:
+					<?php echo ccgp_get_access_setting_human_readable( $ccgp_class->get_page_visibility( $post->ID ) );
+					?> | Status:
+					<?php
+					switch ( $post->post_status ) {
+						case 'private':
+							_e('Privately Published');
+							break;
+						case 'publish':
+							_e('Published');
+							break;
+						case 'future':
+							_e('Scheduled');
+							break;
+						case 'pending':
+							_e('Pending Review');
+							break;
+						case 'draft':
+						case 'auto-draft':
+							_e('Draft');
+							break;
+					}
+					?></span>
 				</li>
 				<?php
 			endif;
