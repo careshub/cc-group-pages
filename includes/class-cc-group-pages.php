@@ -794,12 +794,12 @@ class CC_Group_Pages {
 		$args = array(
 			'post_title' => $title,
 			'post_content' => $_POST['ccgp_content'],
-			'post_name' => sanitize_title( $title ),
 			'post_type' => 'cc_group_page',
 			'post_status' => $published_status,
 			'comment_status' => $comment_status,
 		);
 
+		// We don't attempt to update the slug or post_name. That is done via the "Manage Tabs" screen.
 		if ( $post_id ) {
 			$args['ID'] = $post_id;
 		}
@@ -974,7 +974,7 @@ class CC_Group_Pages {
 	 *
 	 * @return string: URI
 	 */
-	public function get_base_permalink( $group_id = false, $tab_slug ) {
+	public function get_base_permalink( $group_id = false, $tab_slug = '' ) {
 		if ( empty( $tab_slug ) ) {
 			$tab_slug = $this->get_manage_pages_slug();
 		}

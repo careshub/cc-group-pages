@@ -20,7 +20,7 @@
 .tab-details .details-pane {
     display: none;
 }
-.details-pane input {
+.details-pane input[type=text] {
     width: 96%;
 }
 .page-list {

@@ -164,7 +164,7 @@ class CC_Group_Pages_Public {
 				// Create a new post
 				$post_data = array(
 					'post_title'	=> 'Untitled',
-					'post_status'    => 'draft',
+					'post_status'    => 'auto-draft',
 					'post_type'      => 'cc_group_page',
 					'tax_input'      => array( 'ccgp_related_groups' => $group_term ),
 				);

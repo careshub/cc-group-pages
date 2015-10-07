@@ -219,6 +219,12 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
                             $page_details[$post_id]['visibility'] = $visibility;
                         }
                     }
+                    if ( isset( $page_details[$post_id]['slug'] ) ) {
+                        $page_slug = sanitize_title( $page_details[$post_id]['slug'] );
+                    } else {
+                        $page_slug = '';
+                    }
+
                     $ordered_tabs[$tab_key]['pages'][$j] = array(
                         'post_id' => $post_id,
                         'visibility' => $visibility
@@ -238,18 +244,38 @@ if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problem
             // $page_details is $_POST['ccgp-pages']
             if ( isset( $page_details ) && ! empty( $page_details ) ) {
                 foreach ( $page_details as $post_id => $post_data) {
+                    // Get the current (pre-save) post status.
+                    $post_status = get_post_status( $post_id );
+
                     $post_args = array(
                         'ID' => $post_id,
                         'post_type' => 'cc_group_page'
                     );
+
+                    // Set the post title.
                     if ( ! empty( $post_data['title'] ) ) {
                         $post_args[ 'post_title' ] = $post_data['title'];
-                        $post_args[ 'post_name' ] = sanitize_title( $post_data['title'] );
                     }
+
+                    // Set the post name (slug).
+                    // If one has been set, we use it.
+                    if ( ! empty( $post_data['slug'] ) ) {
+                        $post_args[ 'post_name' ] = sanitize_title( $post_data['slug'] );
+                    }
+
+                    if ( 'auto-draft' == $post_status ) {
+                        // If the post is still an auto-draft, we may need to invent a slug.
+                        if ( empty( $post_args[ 'post_name' ] ) ) {
+                            $post_args[ 'post_name' ] = sanitize_title( $post_data['title'] );
+                        }
+                        // Switch the post status to "draft"
+                        $post_args[ 'post_status' ] = 'draft';
+                    }
+
                     $post_id = wp_update_post( $post_args, true );
                     if ( is_wp_error( $post_id ) ) {
                         $errors = $post_id->get_error_messages();
-                        foreach ($errors as $error) {
+                        foreach ( $errors as $error ) {
                             $towrite = PHP_EOL . 'wp_error: ' . print_r($error, TRUE);
                         }
                         $fp = fopen('ccgp-save-errors.txt', 'a');
@@ -378,12 +404,15 @@ function ccgp_setup_settings_form( $group_id ){
                             <?php if ( ! empty( $tab_details['pages'] ) && is_array( $tab_details['pages'] ) ) {
                                     foreach ( $tab_details['pages'] as $order => $post_details ) {
                                         $used_pages[] = $post_details['post_id'];
+                                        $post_object = get_post( $post_details['post_id'] );
                                      ?>
                                     <li class="draggable" id="post-<?php echo $post_details['post_id'] ?>">
                                         <span class="arrow-up"></span><span class="arrow-down"></span>Title: <?php echo get_the_title( $post_details['post_id'] ); ?> <a href="#" class="toggle-details-pane">Edit details</a>
                                         <div class="details-pane">
                                             <label for="ccgp-page-<?php echo $post_details['post_id'] ?>-title" >Page Title</label>
                                             <input type="text" id="ccgp-page-<?php echo $post_details['post_id'] ?>-title" name="ccgp-pages[<?php echo $post_details['post_id'] ?>][title]" value="<?php echo get_the_title( $post_details['post_id'] ); ?>"/>
+                                            <label for="ccgp-page-<?php echo $post_details['post_id']; ?>-slug" >Page Slug</label>
+                                            <input type="text" id="ccgp-page-<?php echo $post_details['post_id'] ?>-slug" name="ccgp-pages[<?php echo $post_details['post_id'] ?>][slug]" value="<?php echo $post_object->post_name; ?>"/>
                                             <div class="page-visibility-control">
                                                 <label for="cccgp-page-<?php echo $post_details['post_id']; ?>-visibility">Access</label>
                                                 <select name="ccgp-pages[<?php echo $post_details['post_id']; ?>][visibility]" id="ccgp-page-<?php echo $post_details['post_id']; ?>-visibility" class="page-visibility">
@@ -415,12 +444,15 @@ function ccgp_setup_settings_form( $group_id ){
                     if ( ! empty( $all_pages ) ) {
                         foreach ( $all_pages as $page ) {
                             if ( ! in_array( $page->ID, $used_pages ) ) {
+                                $post_object = get_post( $page->ID );
                                 ?>
                                     <li class="draggable" id="post-<?php echo $page->ID; ?>">
                                         <span class="arrow-up"></span><span class="arrow-down"></span>Title: <?php echo $page->post_title; ?> <a href="#" class="toggle-details-pane">Edit details</a>
                                         <div class="details-pane">
                                             <label for="ccgp-page-<?php echo $page->ID; ?>-title" >Page Title</label>
                                             <input type="text" id="ccgp-page-<?php echo $page->ID; ?>-title" name="ccgp-pages[<?php echo $page->ID; ?>][title]" value="<?php echo $page->post_title; ?>"/>
+                                            <label for="ccgp-page-<?php echo $page->ID; ?>-slug" >Page Slug</label>
+                                            <input type="text" id="ccgp-page-<?php echo $page->ID; ?>-slug" name="ccgp-pages[<?php echo $page->ID; ?>][slug]" value="<?php echo $post_object->post_name; ?>"/>
                                             <label for="cccgp-page-<?php echo $page->ID; ?>-visibility">Access</label>
                                             <select name="ccgp-pages[<?php echo $page->ID;?>][visibility]" id="ccgp-page-<?php echo $tab_id; ?>-visibility">
                                                 <?php foreach ( $access_levels as $key => $value ) { ?>

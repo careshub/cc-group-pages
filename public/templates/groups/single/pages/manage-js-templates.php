@@ -10,9 +10,12 @@ $access_levels = array(
 <script type="text/html" id="tmpl-ccgp-page">
     <li class="draggable" id="post-{{data.post_id}}">
     <span class="arrow-up"></span><span class="arrow-down"></span>Title: {{data.post_title}} <a href="#" class="toggle-details-pane">Edit</a>
-        <div class="details-pane">
+        <div class="details-pane" style="display: block;">
             <label for="ccgp-page-{{data.post_id}}-title" >Page Title</label>
             <input type="text" id="ccgp-page-{{data.post_id}}-title" name="ccgp-pages[{{data.post_id}}][title]" value="{{data.post_title}} "/>
+            <label for="ccgp-page-{{data.post_id}}-slug" >Page Slug (optional)</label>
+            <input type="text" id="ccgp-page-{{data.post_id}}-slug" name="ccgp-pages[{{data.post_id}}][slug]" value="{{data.post_slug}} "/>
+            <p class="info">Leave this empty if you want the slug to be created from the title.</p>
             <div class="page-visibility-control">
                 <label for="ccgp-page-{{data.post_id}}-visibility">Access</label>
                 <select name="ccgp-pages[{{data.post_id}}][visibility]" id="ccgp-page-{{data.post_id}}-visibility" class="page-visibility">
