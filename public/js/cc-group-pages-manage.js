@@ -30,7 +30,6 @@
 	        placeholder: "ui-draggable-drop-zone",
 	        // revert: true
 	        stop: function(event, ui) {
-	        	console.log(ui);
 		        ui.item.first().removeAttr('style'); // undo styling set by jQueryUI while the items are being transported.
 		        populatePageOrder();
 		        updatePageVisibility();
@@ -51,8 +50,6 @@
         });
         $( '#pages-order' ).val( $.param( completeOrder ) );
         updatePageVisibility();
-        console.log( 'page order in populatePageOrder' );
-        console.log( $.param( completeOrder ) );
     }
 
     function updatePageVisibility() {
@@ -106,7 +103,6 @@
 
 	// }
 	function addPageSuccess( data ) {
-		console.log( data );
 		$( '#'+data.target_list ).append( ccgpPage( data ) );
 		//We have to reinitialize the sortable. Ugh.
 		initializeSortable();
@@ -167,7 +163,6 @@
 		jQuery('.tab-details').not('#unused-pages').each( function() {
 			increment.push( jQuery(this).attr("id").replace('tabs-','') );
 		});
-		console.log( increment );
 		return Math.max.apply(Math, increment) + 1;
 	}
 	function ccgpCreateTabonClick( event ) {
@@ -175,9 +170,6 @@
 		var id = getNextTabID(),
 			details = defaultTabDetails;
 
-		console.log( 'data for tab creation on click' );
-		// console.log( id );
-		console.log( details );
 		ccgpCreateTab( id, details );
 		// Expand the details pane for the new tab.
 		$( "#tabs-" + id ).find(".details-pane").show();
@@ -187,8 +179,6 @@
 						"details": details,
 						"access_levels": access_levels
 					};
-		console.log( 'data for tab creation on init' );
-		console.log( tabData );
 
 		$( '#unused-pages' ).before( ccgpTab( tabData ) );
 		initializeSortable();
@@ -209,49 +199,18 @@
 			maybeShowAddTabButton();
 		});
 	}
-	// function ccgpSetTabValues( id, details) {
-	// 	for ( var field in details ) {
-	// 		// We're doing this because the AJAX-produced input fields don't show their values.
-	// 		$( '#ccgp-tab-'+id+'-'+field ).val( details[field] );
-	// 	}
-	// }
 
-	// function ccgpBuildTabsOnInit( data ){
-	// 	console.log( 'incoming init info' );
-	// 	console.log(data);
-	// 	if ( data === Object(data) ) {
-	// 		for ( var id in data ) {
-	// 			ccgpCreateTab( id, data[id] );
-	// 			ccgpSetTabValues( id, data[id] );
-	// 			ccgpBuildPagesOnInit( id, data[id] )
-	// 		}
-	// 	}
-	// }
-	// function ccgpBuildPagesOnInit( tabID, data ){
-	// 	console.log( 'incoming page init info' );
-	// 	console.log(data);
-	// 	if ( data.pages === Object(data.pages) ) {
-	// 		var pages = data.pages
-	// 		console.log( 'pages object?' );
-	// 		console.log( pages );
-	// 		for ( var i in pages ) {
-	// 			console.log( 'post_id?' );
-	// 			console.log( pages[i].post_id );
-	// 			ccgpGetPageDetails( tabID, pages[i].post_id );
-	// 		}
-	// 	}
-	// }
-	// We can only handle 5 tabs total, so don't allow the user to add more than that.
+	// We can only handle 6 tabs total, so don't allow the user to add more than that.
 	function maybeHideAddTabButton(){
 		// The Bullpen is the fifth fieldset
-		if ( $(".tab-details").length >= 6 ) {
+		if ( $(".tab-details").length >= 7 ) {
 			$("#ccgp-add-tab").hide();
 		}
 	}
-	// If less than 5 tabs total, the user may add another.
+	// If less than 6 tabs total, the user may add another.
 	function maybeShowAddTabButton(){
 		// The Bullpen is the fifth fieldset
-		if ( $(".tab-details").length < 6 ) {
+		if ( $(".tab-details").length < 7 ) {
 			$("#ccgp-add-tab").show();
 		}
 	}

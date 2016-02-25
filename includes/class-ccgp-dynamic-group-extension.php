@@ -366,6 +366,71 @@ if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problem
 
                     }
                     bp_register_group_extension( 'CCGP_Pages_Tab_Five_Extension' );
+                } else if ( $j == 6 ) {
+
+                    class CCGP_Pages_Tab_Six_Extension extends BP_Group_Extension {
+
+                        function __construct() {
+
+                            $tab_details = ccgp_get_group_extension_params( 6 );
+                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
+                            if ( 'mod' == $tab_details['visibility'] ) {
+                                $visibility = array( 'mod', 'admin' );
+                            } else {
+                                $visibility = $tab_details['visibility'];
+                            }
+
+                           if ( ! isset( $tab_details['show-tab'] ) ) {
+                                $show_tab = 'noone';
+                            } else {
+                                $show_tab = $visibility;
+                            }
+
+                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
+
+                            $args = array(
+                                    'slug'              => $tab_details['slug'],
+                                    'name'              => $tab_details['label'],
+                                    'access'            => $visibility, // BP 2.1
+                                    'show_tab'          => $show_tab, // BP 2.1
+                                    'nav_item_position' => $tab_nav_order,
+                                    'screens' => array(
+                                        'edit' => array(
+                                            'enabled' => false,
+                                        ),
+                                        'create' => array(
+                                            'enabled' => false,
+                                        ),
+                                        'admin' => array(
+                                            'enabled' => false,
+                                        ),
+                                    ),
+                                );
+
+                            parent::init( $args );
+
+                        }
+                        /**
+                         * settings_screen() is the catch-all method for displaying the content
+                         * of the edit, create, and Dashboard admin panels
+                         */
+                        function settings_screen( $group_id = 0 ) {}
+
+                        /**
+                         * settings_screen_save() contains the catch-all logic for saving
+                         * settings from the edit, create, and Dashboard admin panels
+                         */
+                        function settings_screen_save( $group_id = 0 ) {}
+                        /**
+                         * Use this function to display the actual content of your group extension when the nav item is selected
+                         */
+                        function display( $group_id = null ) {
+                            // Template location is handled via the template stack. see load_template_filter()
+                            bp_get_template_part( 'groups/single/pages/pages' );
+                        }
+
+                    }
+                    bp_register_group_extension( 'CCGP_Pages_Tab_Six_Extension' );
                 }
                 $j++;
             } // end foreach
