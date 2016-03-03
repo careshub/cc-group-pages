@@ -248,6 +248,14 @@ class CC_Group_Pages {
 			if ( $this->is_post_edit() ) {
 				// add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_edit_scripts') );
 				add_action( 'wp_enqueue_scripts', array( $plugin_public, 'enqueue_edit_styles') );
+			} else {
+				/**
+				 * In the component, but not in the edit screen,
+				 * inject the page's info into the Open Graph meta tags.
+				 */
+				add_action( 'cc_open_graph_is_single', '__return_true' );
+				add_action( 'cc_open_graph_post_id', array( $plugin_public, 'open_graph_post_id') );
+
 			}
 		}
 

@@ -210,4 +210,35 @@ class CC_Group_Pages_Public {
 		// Send the comment data back to Javascript.
 		wp_send_json_success( $retval );
 	}
+
+	/**
+	 * Let the CC Open Graph plugin know which post we're using.
+	 *
+	 * @since    1.0.0
+	 */
+	public function open_graph_post_id( $post_id ) {
+		$ccgp_class = new CC_Group_Pages();
+		$query = array();
+		// If a page is specifically requested, this is the single result.
+		if ( $ccgp_class->is_single_post() ) {
+			$query = $ccgp_class->get_query();
+		} else {
+			// This is the default page for one of the tabs.
+		    $query = $ccgp_class->get_pages_query_for_tab();
+		}
+
+		if ( $query ) {
+			// All we need is the post's ID
+			$query['fields'] = 'ids';
+			// Don't include drafts.
+			$query['post_status'] = array( 'publish' );
+			$pages = new WP_Query( $query );
+		    if ( ! empty( $pages->posts ) ) {
+		    	$post_id = current( $pages->posts );
+			}
+		}
+
+		return $post_id;
+
+	}
 }
