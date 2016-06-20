@@ -937,6 +937,13 @@ class CC_Group_Pages {
 				$query['post__in'] = array( 0 );
 			}
 			$query['orderby'] = 'post__in';
+
+
+		}
+
+		if ( $this->is_page_management_tab() ) {
+			// Show them all on the manage page.
+			$query['posts_per_page'] = -1;
 		}
 
 		// If the status is specified, respect it, otherwise use the user's abilities to determine.
