@@ -255,7 +255,6 @@ class CC_Group_Pages {
 				 */
 				add_action( 'cc_open_graph_is_single', '__return_true' );
 				add_action( 'cc_open_graph_post_id', array( $plugin_public, 'open_graph_post_id') );
-
 			}
 		}
 
