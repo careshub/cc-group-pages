@@ -833,6 +833,7 @@ class CC_Group_Pages {
 			$query = array(
 				'name' => bp_action_variable( 0 ),
 				'post_type' => 'cc_group_page',
+				'posts_per_page' => -1,
 				// 'post_status' => array( 'publish', 'draft'),
 			);
 		} else {
@@ -940,8 +941,8 @@ class CC_Group_Pages {
 
 		}
 
-		if ( $this->is_page_management_tab() ) {
-			// Show them all on the manage page.
+		if ( $this->is_page_management_tab() || $this->is_single_post() ) {
+			// Show them all on the manage page. We also need to fetch all of them on a single page load.
 			$query['posts_per_page'] = -1;
 		}
 
