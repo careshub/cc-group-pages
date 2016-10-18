@@ -1,455 +1,218 @@
 <?php
 /**
- * CC BuddyPress Group Home Pages
+ * CC BuddyPress Group Pages
  *
- * @package   CC BuddyPress Group Home Pages
+ * @package   CC BuddyPress Group Pages
  * @author    CARES staff
  * @license   GPL-2.0+
  * @copyright 2014 CommmunityCommons.org
  */
 
-// We're mostly using the group extension to create a way for group admins to edit the group's home page via the group's Admin tab
+/*
+ * Class to add display hooks for the tabs for this group.
+ *
+ * @since 1.1.0
+ */
+class CCGP_Tab_Display {
 
-if ( class_exists( 'BP_Group_Extension' ) ) { // Recommended, to prevent problems during upgrade or when Groups are disabled
+    /**
+     * The current group ID.
+     *
+     * @since    1.1.0
+     * @access   protected
+     * @var      int    $group_id    The ID of the current group.
+     */
+    protected $group_id;
 
-// Only bother when in a single group
-    if ( $group_id = bp_get_current_group_id() ) {
-        $tab_structure = array();
+    /**
+     * The calculated access status for the tabs of this group.
+     *
+     * @since    1.1.0
+     * @access   protected
+     * @var      array    $user_has_access    The access statuses, keyed by slug.
+     */
+    protected $user_has_access = array();
 
-        if ( (bool) groups_get_groupmeta( $group_id, "ccgp_is_enabled" ) ) {
-            $tab_structure = ccgp_get_page_order( $group_id, $jsonify = false );
+    public function __construct( $group_id = 0 ) {
+        if ( empty( $group_id ) ) {
+            $group_id = bp_get_current_group_id();
         }
-        // $towrite = PHP_EOL . 'tab structure in dynamic class generator: ' . print_r( $tab_structure, TRUE );
-        // $fp = fopen('ccgp-dynamic-classes.txt', 'a');
-        // fwrite($fp, $towrite);
-        // fclose($fp);
-
-        if ( ! empty( $tab_structure ) && is_array( $tab_structure )  ) {
-            // We'll need an iterator to choose the right extension.
-            $j = 1;
-
-            foreach ( $tab_structure as $key => $tab_details ) {
-
-                // Class names can't be declared dynamically, so we'll just have to set a maximum and loop them with hardcoded class names.
-
-                if ( $j == 1 ) {
-
-                    class CCGP_Pages_Tab_One_Extension extends BP_Group_Extension {
-                        function __construct() {
-
-                            $tab_details = ccgp_get_group_extension_params( 1 );
-
-                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
-                            if ( 'mod' == $tab_details['visibility'] ) {
-                                $visibility = array( 'mod', 'admin' );
-                            } else {
-                                $visibility = $tab_details['visibility'];
-                            }
-
-                            if ( ! isset( $tab_details['show-tab'] ) ) {
-                                $show_tab = 'noone';
-                            } else {
-                                $show_tab = $visibility;
-                            }
-
-                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
-
-                            $args = array(
-                                    'slug'              => $tab_details['slug'],
-                                    'name'              => $tab_details['label'],
-                                    'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $show_tab, // BP 2.1
-                                    'nav_item_position' => $tab_nav_order,
-                                    'screens' => array(
-                                        'edit' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'create' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'admin' => array(
-                                            'enabled' => false,
-                                        ),
-                                    ),
-                                );
-                            // $towrite = PHP_EOL . 'tab details: ' . print_r( $tab_details, TRUE );
-                            // $towrite .= PHP_EOL . 'init args: ' . print_r( $args, TRUE );
-                            // $fp = fopen('ccgp-dynamic-classes.txt', 'a');
-                            // fwrite($fp, $towrite);
-                            // fclose($fp);
-                            parent::init( $args );
-
-                        }
-                        /**
-                         * settings_screen() is the catch-all method for displaying the content
-                         * of the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen( $group_id = 0 ) {}
-
-                        /**
-                         * settings_screen_save() contains the catch-all logic for saving
-                         * settings from the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen_save( $group_id = 0 ) {}
-
-                        /**
-                         * Use this function to display the actual content of your group extension when the nav item is selected
-                         */
-                        function display( $group_id = null ) {
-                            // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages/pages' );
-                        }
-
-                    }
-                    bp_register_group_extension( 'CCGP_Pages_Tab_One_Extension' );
-
-                } else if ( $j == 2 ) {
-
-                    class CCGP_Pages_Tab_Two_Extension extends BP_Group_Extension {
-
-                        function __construct() {
-
-                            $tab_details = ccgp_get_group_extension_params( 2 );
-                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
-                            if ( 'mod' == $tab_details['visibility'] ) {
-                                $visibility = array( 'mod', 'admin' );
-                            } else {
-                                $visibility = $tab_details['visibility'];
-                            }
-
-                           if ( ! isset( $tab_details['show-tab'] ) ) {
-                                $show_tab = 'noone';
-                            } else {
-                                $show_tab = $visibility;
-                            }
-
-                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
-
-                            $args = array(
-                                    'slug'              => $tab_details['slug'],
-                                    'name'              => $tab_details['label'],
-                                    'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $show_tab, // BP 2.1
-                                    'nav_item_position' => $tab_nav_order,
-                                    'screens' => array(
-                                        'edit' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'create' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'admin' => array(
-                                            'enabled' => false,
-                                        ),
-                                    ),
-                                );
-
-                            parent::init( $args );
-
-                        }
-                        /**
-                         * settings_screen() is the catch-all method for displaying the content
-                         * of the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen( $group_id = 0 ) {}
-
-                        /**
-                         * settings_screen_save() contains the catch-all logic for saving
-                         * settings from the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen_save( $group_id = 0 ) {}
-                        /**
-                         * Use this function to display the actual content of your group extension when the nav item is selected
-                         */
-                        function display( $group_id = null ) {
-                            // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages/pages' );
-                        }
-
-                    }
-                    bp_register_group_extension( 'CCGP_Pages_Tab_Two_Extension' );
-
-                } else if ( $j == 3 ) {
-
-                    class CCGP_Pages_Tab_Three_Extension extends BP_Group_Extension {
-
-                        function __construct() {
-
-                            $tab_details = ccgp_get_group_extension_params( 3 );
-                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
-                            if ( 'mod' == $tab_details['visibility'] ) {
-                                $visibility = array( 'mod', 'admin' );
-                            } else {
-                                $visibility = $tab_details['visibility'];
-                            }
-
-                           if ( ! isset( $tab_details['show-tab'] ) ) {
-                                $show_tab = 'noone';
-                            } else {
-                                $show_tab = $visibility;
-                            }
-
-                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
-
-                            $args = array(
-                                    'slug'              => $tab_details['slug'],
-                                    'name'              => $tab_details['label'],
-                                    'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $show_tab, // BP 2.1
-                                    'nav_item_position' => $tab_nav_order,
-                                    'screens' => array(
-                                        'edit' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'create' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'admin' => array(
-                                            'enabled' => false,
-                                        ),
-                                    ),
-                                );
-
-                            parent::init( $args );
-
-                        }
-                        /**
-                         * settings_screen() is the catch-all method for displaying the content
-                         * of the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen( $group_id = 0 ) {}
-
-                        /**
-                         * settings_screen_save() contains the catch-all logic for saving
-                         * settings from the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen_save( $group_id = 0 ) {}
-                        /**
-                         * Use this function to display the actual content of your group extension when the nav item is selected
-                         */
-                        function display( $group_id = null ) {
-                            // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages/pages' );
-                        }
-
-                    }
-                    bp_register_group_extension( 'CCGP_Pages_Tab_Three_Extension' );
-
-                } else if ( $j == 4 ) {
-
-                    class CCGP_Pages_Tab_Four_Extension extends BP_Group_Extension {
-
-                        function __construct() {
-
-                            $tab_details = ccgp_get_group_extension_params( 4 );
-                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
-                            if ( 'mod' == $tab_details['visibility'] ) {
-                                $visibility = array( 'mod', 'admin' );
-                            } else {
-                                $visibility = $tab_details['visibility'];
-                            }
-
-                           if ( ! isset( $tab_details['show-tab'] ) ) {
-                                $show_tab = 'noone';
-                            } else {
-                                $show_tab = $visibility;
-                            }
-
-                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
-
-                            $args = array(
-                                    'slug'              => $tab_details['slug'],
-                                    'name'              => $tab_details['label'],
-                                    'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $show_tab, // BP 2.1
-                                    'nav_item_position' => $tab_nav_order,
-                                    'screens' => array(
-                                        'edit' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'create' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'admin' => array(
-                                            'enabled' => false,
-                                        ),
-                                    ),
-                                );
-
-                            parent::init( $args );
-
-                        }
-                        /**
-                         * settings_screen() is the catch-all method for displaying the content
-                         * of the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen( $group_id = 0 ) {}
-
-                        /**
-                         * settings_screen_save() contains the catch-all logic for saving
-                         * settings from the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen_save( $group_id = 0 ) {}
-                        /**
-                         * Use this function to display the actual content of your group extension when the nav item is selected
-                         */
-                        function display( $group_id = null ) {
-                            // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages/pages' );
-                        }
-
-                    }
-                    bp_register_group_extension( 'CCGP_Pages_Tab_Four_Extension' );
-
-                } else if ( $j == 5 ) {
-
-                    class CCGP_Pages_Tab_Five_Extension extends BP_Group_Extension {
-
-                        function __construct() {
-
-                            $tab_details = ccgp_get_group_extension_params( 5 );
-                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
-                            if ( 'mod' == $tab_details['visibility'] ) {
-                                $visibility = array( 'mod', 'admin' );
-                            } else {
-                                $visibility = $tab_details['visibility'];
-                            }
-
-                           if ( ! isset( $tab_details['show-tab'] ) ) {
-                                $show_tab = 'noone';
-                            } else {
-                                $show_tab = $visibility;
-                            }
-
-                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
-
-                            $args = array(
-                                    'slug'              => $tab_details['slug'],
-                                    'name'              => $tab_details['label'],
-                                    'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $show_tab, // BP 2.1
-                                    'nav_item_position' => $tab_nav_order,
-                                    'screens' => array(
-                                        'edit' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'create' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'admin' => array(
-                                            'enabled' => false,
-                                        ),
-                                    ),
-                                );
-
-                            parent::init( $args );
-
-                        }
-                        /**
-                         * settings_screen() is the catch-all method for displaying the content
-                         * of the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen( $group_id = 0 ) {}
-
-                        /**
-                         * settings_screen_save() contains the catch-all logic for saving
-                         * settings from the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen_save( $group_id = 0 ) {}
-                        /**
-                         * Use this function to display the actual content of your group extension when the nav item is selected
-                         */
-                        function display( $group_id = null ) {
-                            // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages/pages' );
-                        }
-
-                    }
-                    bp_register_group_extension( 'CCGP_Pages_Tab_Five_Extension' );
-                } else if ( $j == 6 ) {
-
-                    class CCGP_Pages_Tab_Six_Extension extends BP_Group_Extension {
-
-                        function __construct() {
-
-                            $tab_details = ccgp_get_group_extension_params( 6 );
-                            // The BP group member schema thinks of mods and admins as separate groups, so if we choose "mods and above", we need to specify both groups.
-                            if ( 'mod' == $tab_details['visibility'] ) {
-                                $visibility = array( 'mod', 'admin' );
-                            } else {
-                                $visibility = $tab_details['visibility'];
-                            }
-
-                           if ( ! isset( $tab_details['show-tab'] ) ) {
-                                $show_tab = 'noone';
-                            } else {
-                                $show_tab = $visibility;
-                            }
-
-                            $tab_nav_order = ( ! empty( $tab_details['nav_order'] ) ) ? (int) $tab_details['nav_order'] : 81;
-
-                            $args = array(
-                                    'slug'              => $tab_details['slug'],
-                                    'name'              => $tab_details['label'],
-                                    'access'            => $visibility, // BP 2.1
-                                    'show_tab'          => $show_tab, // BP 2.1
-                                    'nav_item_position' => $tab_nav_order,
-                                    'screens' => array(
-                                        'edit' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'create' => array(
-                                            'enabled' => false,
-                                        ),
-                                        'admin' => array(
-                                            'enabled' => false,
-                                        ),
-                                    ),
-                                );
-
-                            parent::init( $args );
-
-                        }
-                        /**
-                         * settings_screen() is the catch-all method for displaying the content
-                         * of the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen( $group_id = 0 ) {}
-
-                        /**
-                         * settings_screen_save() contains the catch-all logic for saving
-                         * settings from the edit, create, and Dashboard admin panels
-                         */
-                        function settings_screen_save( $group_id = 0 ) {}
-                        /**
-                         * Use this function to display the actual content of your group extension when the nav item is selected
-                         */
-                        function display( $group_id = null ) {
-                            // Template location is handled via the template stack. see load_template_filter()
-                            bp_get_template_part( 'groups/single/pages/pages' );
-                        }
-
-                    }
-                    bp_register_group_extension( 'CCGP_Pages_Tab_Six_Extension' );
+        $this->group_id = $group_id;
+        $this->tab_creation_loop();
+    }
+
+    /**
+     * Run setup routine if needed for this group.
+     *
+     * @since 1.1.0
+     *
+     * @param array $tab Tab details.
+     * @return void
+     */
+    public function tab_creation_loop() {
+        $tabs = array();
+        if ( (bool) groups_get_groupmeta( $this->group_id, 'ccgp_is_enabled' ) ) {
+            $tabs = ccgp_get_page_order( $this->group_id, $jsonify = false );
+        }
+
+        if ( empty( $tabs ) || ! is_array( $tabs ) ) {
+            return;
+        }
+
+        foreach ( $tabs as $key => $tab ) {
+            $this->add_display_hooks( $tab );
+        }
+
+    }
+
+    /**
+     * Set up nav items and register screen fucntions for this group's tabs.
+     *
+     * @since 1.1.0
+     *
+     * @param array $tab Tab details.
+     * @return void
+     */
+    public function add_display_hooks( $tab ) {
+        // If the user can visit the screen, we register it.
+        if ( ! isset( $tab['show-tab'] ) ) {
+            $can_access = false;
+        } else {
+            $can_access = $this->user_meets_access_condition( $tab['visibility'] );
+        }
+
+        $this->user_has_access[ $tab['slug'] ] = $can_access;
+
+        $towrite = PHP_EOL . '$this->user_has_access: ' . print_r( $this->user_has_access, TRUE );
+        $fp = fopen('ccgp-dynamic-classes.txt', 'a');
+        fwrite($fp, $towrite);
+        fclose($fp);
+
+        $group_permalink = bp_get_group_permalink( groups_get_current_group() );
+        $group_slug      = bp_get_current_group_slug();
+        $nav_order = ! empty( $tab['nav_order'] ) ? (int) $tab['nav_order'] : 81;
+
+        if ( $can_access ) {
+            bp_core_create_subnav_link( array(
+                'name'            => $tab['label'],
+                'slug'            => $tab['slug'],
+                'parent_slug'     => $group_slug,
+                'parent_url'      => $group_permalink,
+                'position'        => $nav_order,
+                'item_css_id'     => 'nav-' . $tab['slug'],
+                'screen_function' => array( $this, '_display_hook' ),
+                'user_has_access' => $can_access,
+                'no_access_url'   => $group_permalink,
+            ), 'groups' );
+        }
+
+        // And register the screen function.
+        bp_core_register_subnav_screen_function( array(
+            'slug'            => $tab['slug'],
+            'parent_slug'     => $group_slug,
+            'screen_function' => array( $this, '_display_hook' ),
+            'user_has_access' => $can_access,
+            'no_access_url'   => $group_permalink,
+        ), 'groups' );
+
+        // When we are viewing the extension display page, set the title and options title.
+        if ( bp_is_current_action( $tab['slug'] ) ) {
+            add_filter( 'bp_group_user_has_access',   array( $this, 'group_access_protection' ), 10, 2 );
+            add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( $this->name ) . '";' ) );
+            add_action( 'bp_template_title',          create_function( '', 'echo "' . esc_attr( $this->name ) . '";' ) );
+        }
+    }
+
+    /**
+     * Hook the main display method, and loads the template file.
+     *
+     * @since 1.1.0
+     */
+    public function _display_hook() {
+        add_action( 'bp_template_content', function(){
+            bp_get_template_part( 'groups/single/pages/pages' );
+        } );
+
+        // bp_get_template_part( 'groups/single/pages/pages' );
+
+        bp_core_load_template( apply_filters( 'bp_core_template_plugin', 'groups/single/plugins' ) );
+    }
+
+    /**
+     * Check whether the current user meets an access condition.
+     *
+     * @since 1.1.0
+     *
+     * @param string $access_condition 'anyone', 'loggedin', 'member',
+     *                                 'mod', 'admin' or 'noone'.
+     * @return bool
+     */
+    protected function user_meets_access_condition( $access_condition ) {
+        if ( current_user_can( 'bp_moderate' ) ) {
+            return true;
+        }
+
+        switch ( $access_condition ) {
+            case 'admin' :
+                $meets_condition = groups_is_user_admin( bp_loggedin_user_id(), $this->group_id );
+                break;
+
+            case 'mod' :
+                if ( groups_is_user_admin( bp_loggedin_user_id(), $this->group_id ) || groups_is_user_mod( bp_loggedin_user_id(), $this->group_id ) ) {
+                    $meets_condition = true;
+                } else {
+                    $meets_condition = false;
                 }
-                $j++;
-            } // end foreach
+                break;
 
-        } // if ( ! empty( $tab_structure ) && is_array( $tab_structure )  ) :
-    } // if ( bp_is_group() ) :
-} // class_exists( 'BP_Group_Extension' )
+            case 'member' :
+                $meets_condition = groups_is_user_member( bp_loggedin_user_id(), $this->group_id );
+                break;
 
+            case 'loggedin' :
+                $meets_condition = is_user_logged_in();
+                break;
 
-/**
-* Get the parameters for a single tab.
-* Used when creating the tab within the BP_Group_Extension class extension,
-* since variables cannot be passed into the class.
-*
-* @since 1.0.0
-*/
-function ccgp_get_group_extension_params( $position ) {
-    // Since we're talking positions, not keys, we'll use array_slice to get one piece only
-    $tab_structure = ccgp_get_page_order( bp_get_current_group_id(), $jsonify = false );
-    $tab_details = array_slice( $tab_structure, $position - 1, 1 );
-    return current( $tab_details );
+            case 'noone' :
+                $meets_condition = false;
+                break;
+
+            case 'anyone' :
+            default :
+                $meets_condition = true;
+                break;
+        }
+
+        return $meets_condition;
+    }
+
+    /**
+     * Filter the access check in bp_groups_group_access_protection() for this extension.
+     *
+     * Note that $no_access_args is passed by reference, as there are some
+     * circumstances where the bp_core_no_access() arguments need to be
+     * modified before the redirect takes place.
+     *
+     * @since 1.1.0
+     *
+     * @param bool  $user_can_visit Whether or not the user can visit the tab.
+     * @param array $no_access_args Array of args to help determine access.
+     * @return bool
+     */
+    public function group_access_protection( $user_can_visit, &$no_access_args ) {
+        if ( isset( $this->user_has_access[ bp_current_action() ] ) ) {
+            $user_can_visit = $this->user_has_access[ bp_current_action() ];
+        }
+
+        if ( ! $user_can_visit && is_user_logged_in() ) {
+            $current_group = groups_get_group( $this->group_id );
+
+            $no_access_args['message'] = __( 'You do not have access to this content.', 'buddypress' );
+            $no_access_args['root'] = bp_get_group_permalink( $current_group ) . 'home/';
+            $no_access_args['redirect'] = false;
+        }
+
+        return $user_can_visit;
+    }
+
 }

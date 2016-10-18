@@ -1,14 +1,15 @@
 <?php
 /**
- * CC BuddyPress Group Home Pages
+ * CC BuddyPress Group Pages
  *
- * @package   CC BuddyPress Group Home Pages
+ * @package   CC BuddyPress Group Pages
  * @author    CARES staff
  * @license   GPL-2.0+
  * @copyright 2014 CommmunityCommons.org
  */
 
-// We're mostly using the group extension to create a way for group admins to edit the group's home page via the group's Admin tab
+// This group extension creates the page management tab.
+// We do this because group mods may need to edit pages, and they can't access the group's admin screens.
 
 if ( class_exists( 'BP_Group_Extension' ) ) : // Recommended, to prevent problems during upgrade or when Groups are disabled
 
@@ -357,7 +358,7 @@ function ccgp_setup_settings_form( $group_id ){
     $used_pages = array();
     $access_levels = ccgp_get_access_settings_options();
     ?>
-    <a href="#" id="ccgp-add-tab" class="button"<?php if ( count( $page_order ) > 5 ) { echo ' style="display:none;"'; } ?>>Add a new tab</a>
+    <a href="#" id="ccgp-add-tab" class="button">Add a new tab</a>
     <div id="tabs-container" class="clear clear-both">
         <?php if ( ! empty( $page_order ) && is_array( $page_order ) ) {
             foreach ( $page_order as $tab_id => $tab_details ) { ?>
