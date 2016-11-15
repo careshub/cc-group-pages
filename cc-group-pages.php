@@ -16,7 +16,7 @@
  * Plugin Name:       CC Group Pages
  * Plugin URI:        http://example.com/plugin-name-uri/
  * Description:       Adds a single tab to a group that shows related pages.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            David Cavins
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -81,5 +81,8 @@ add_action( 'bp_include', 'cc_group_pages_extension_class_init', 22 );
  */
 function cc_group_pages_dynamic_extension_class_init() {
     require_once plugin_dir_path( __FILE__ ) . 'includes/class-ccgp-dynamic-group-extension.php';
+    if ( $group_id = bp_get_current_group_id() ) {
+	    $make_tabs = new CCGP_Tab_Display( $group_id );
+	}
 }
 add_action( 'bp_init', 'cc_group_pages_dynamic_extension_class_init', 9 );

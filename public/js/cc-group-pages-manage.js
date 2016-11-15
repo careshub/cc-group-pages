@@ -183,7 +183,6 @@
 		$( '#unused-pages' ).before( ccgpTab( tabData ) );
 		initializeSortable();
 		populatePageOrder();
-		maybeHideAddTabButton();
 	}
 	function ccgpRemoveTab( e, that) {
 		var target = e.target;
@@ -196,23 +195,7 @@
 			// Refresh the page order.
 			initializeSortable();
 			populatePageOrder();
-			maybeShowAddTabButton();
 		});
-	}
-
-	// We can only handle 6 tabs total, so don't allow the user to add more than that.
-	function maybeHideAddTabButton(){
-		// The Bullpen is the fifth fieldset
-		if ( $(".tab-details").length >= 7 ) {
-			$("#ccgp-add-tab").hide();
-		}
-	}
-	// If less than 6 tabs total, the user may add another.
-	function maybeShowAddTabButton(){
-		// The Bullpen is the fifth fieldset
-		if ( $(".tab-details").length < 7 ) {
-			$("#ccgp-add-tab").show();
-		}
 	}
 
 	// Listen for various clicks click.
