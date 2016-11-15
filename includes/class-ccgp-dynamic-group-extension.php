@@ -118,8 +118,8 @@ class CCGP_Tab_Display {
         // When we are viewing the extension display page, set the title and options title.
         if ( bp_is_current_action( $tab['slug'] ) ) {
             add_filter( 'bp_group_user_has_access',   array( $this, 'group_access_protection' ), 10, 2 );
-            add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( $this->name ) . '";' ) );
-            add_action( 'bp_template_title',          create_function( '', 'echo "' . esc_attr( $this->name ) . '";' ) );
+            add_action( 'bp_template_content_header', create_function( '', 'echo "' . esc_attr( $tab['label'] ) . '";' ) );
+            add_action( 'bp_template_title',          create_function( '', 'echo "' . esc_attr( $tab['label'] ) . '";' ) );
         }
     }
 
@@ -129,7 +129,7 @@ class CCGP_Tab_Display {
      * @since 1.1.0
      */
     public function _display_hook() {
-        add_action( 'bp_template_content', function(){
+        add_action( 'bp_template_content', function() {
             bp_get_template_part( 'groups/single/pages/pages' );
         } );
 
